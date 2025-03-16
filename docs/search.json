@@ -1,0 +1,72 @@
+[
+  {
+    "objectID": "posts/Text_Classification.html",
+    "href": "posts/Text_Classification.html",
+    "title": "NLP Text Classification Fine Tuning",
+    "section": "",
+    "text": "- colab에서 실습하길 바랍니다.\n# !git clone https://github.com/rickiepark/nlp-with-transformers.git\n# %cd nlp-with-transformers\n# from install import *\n# install_requirements(chapter=2)"
+  },
+  {
+    "objectID": "posts/Text_Classification.html#data-loading-emotion-encoding",
+    "href": "posts/Text_Classification.html#data-loading-emotion-encoding",
+    "title": "NLP Text Classification Fine Tuning",
+    "section": "1. Data loading & Emotion encoding",
+    "text": "1. Data loading & Emotion encoding\n\n# 허깅페이스 데이터셋을 사용하기\nfrom huggingface_hub import list_datasets\nfrom datasets import load_dataset\nfrom datasets import ClassLabel\n\nemotions = load_dataset(\"emotion\")\n\nfrom transformers import AutoTokenizer\nemotions['train'].features['label'] = ClassLabel(num_classes=6, names=['sadness', 'joy', 'love', 'anger', 'fear', 'surprise'])\nmodel_ckpt = \"distilbert-base-uncased\"\ntokenizer = AutoTokenizer.from_pretrained(model_ckpt)\n\ndef tokenize(batch):\n    return tokenizer(batch[\"text\"], padding=True, truncation=True)\n\nemotions_encoded = emotions.map(tokenize, batched=True, batch_size=None)\n\n- 코드 설명 1. emotion 데이터를 불러온다. 2. emotion 데이터에서 train에 있는 레이블을 6개의 감정으로 할당해준다. 3. model을 설정하고 tokenizer도 모델에 맞게 불러온다. 4. tokenize 함수를 선언하고 문장 길이를 맞추기 위해 padding과 truncation을 True로 설정한다. 5. emotion을 토크나이징 한다."
+  },
+  {
+    "objectID": "posts/Text_Classification.html#text-tokenizing",
+    "href": "posts/Text_Classification.html#text-tokenizing",
+    "title": "NLP Text Classification Fine Tuning",
+    "section": "Text tokenizing",
+    "text": "Text tokenizing\n\nfrom transformers import AutoModel\nimport torch\nfrom sklearn.metrics import accuracy_score, f1_score\n\ntext = \"this is a test\"\ninputs = tokenizer(text, return_tensors=\"pt\")\ninputs['input_ids'].size()\n\n- 코드 설명 1. 임의의 테스트 text를 생성 후 토크나이징을 해준다. 2. tokenizer가 반환하는 데이터를 PyTorch 텐서(torch.Tensor) 형식으로 변환하기 위해서 return_tensors=“pt”를 설정한다."
+  },
+  {
+    "objectID": "posts/Text_Classification.html#hf-login",
+    "href": "posts/Text_Classification.html#hf-login",
+    "title": "NLP Text Classification Fine Tuning",
+    "section": "3. HF login",
+    "text": "3. HF login\n\nfrom huggingface_hub import notebook_login\n\nnotebook_login()"
+  },
+  {
+    "objectID": "posts/Text_Classification.html#model",
+    "href": "posts/Text_Classification.html#model",
+    "title": "NLP Text Classification Fine Tuning",
+    "section": "4. model",
+    "text": "4. model\n\nfrom transformers import AutoModelForSequenceClassification\n\ndevice = torch.device(\"cuda\" if torch.cuda.is_available() else \"cpu\")\nnum_labels = 6\nmodel_ckpt = \"distilbert-base-uncased\"\n\n# distilbert-base-uncased가 바디이고 AutoModelForSequenceClassification가 헤드이다.\n# num_label이 6이므로 6개의 감정 클래스를 분류하는 헤드 하나가 추가된 것이다.\nmodel = (AutoModelForSequenceClassification\n         .from_pretrained(model_ckpt, num_labels=num_labels)\n         .to(device))\n\n- 코드 설명 1. GPU를 사용하기 위해 device 설정. 2. label의 개수는 위에서 할당한 대로 6개이고 model도 선언해준다. 3. 여기서 distilbert-base-uncased은 바디이고 AutoModelForSequenceClassification은 헤드이다. 사전학습된 bert모델에 감정 클래스 분류를 위해서 헤드를 추가했다."
+  },
+  {
+    "objectID": "posts/Text_Classification.html#learning",
+    "href": "posts/Text_Classification.html#learning",
+    "title": "NLP Text Classification Fine Tuning",
+    "section": "5. Learning",
+    "text": "5. Learning\n\nfrom transformers import Trainer, TrainingArguments\n\nbatch_size = 64\nlogging_steps = len(emotions_encoded[\"train\"]) // batch_size\nmodel_name = f\"{model_ckpt}-finetuned-emotion\"\ntraining_args = TrainingArguments(output_dir=model_name,\n                                  num_train_epochs=2,\n                                  learning_rate=2e-5,\n                                  per_device_train_batch_size=batch_size,\n                                  per_device_eval_batch_size=batch_size,\n                                  weight_decay=0.01,\n                                  evaluation_strategy=\"epoch\",\n                                  disable_tqdm=False,\n                                  logging_steps=logging_steps,\n                                  push_to_hub=True,\n                                  save_strategy=\"epoch\",\n                                  load_best_model_at_end=True,\n                                  log_level=\"error\",\n                                  report_to=\"none\")\n\n\ndef compute_metrics(pred):\n    labels = pred.label_ids\n    preds = pred.predictions.argmax(-1)\n    f1 = f1_score(labels, preds, average=\"weighted\")\n    acc = accuracy_score(labels, preds)\n    return {\"accuracy\": acc, \"f1\": f1}\n\ntrainer = Trainer(model=model, args=training_args,\n                  compute_metrics=compute_metrics,\n                  train_dataset=emotions_encoded[\"train\"],\n                  eval_dataset=emotions_encoded[\"validation\"],\n                  tokenizer=tokenizer)\ntrainer.train()\n\n- 코드 설명 1. training argument를 설정해준다. 2. 학습을 하고 결과를 보니 Loss, Accuracy, F1 들이 전부 향상된 것을 볼 수 있다. 즉 Fine tuning이 잘 이루어 졌다고 볼 수 있다."
+  },
+  {
+    "objectID": "posts/Text_Classification.html#prediction",
+    "href": "posts/Text_Classification.html#prediction",
+    "title": "NLP Text Classification Fine Tuning",
+    "section": "6. Prediction",
+    "text": "6. Prediction\n\noutput = trainer.predict(emotions_encoded[\"validation\"])\noutput.metrics\n\n\nimport numpy as np\nyy = np.argmax(output.predictions,axis=1)\nyy"
+  },
+  {
+    "objectID": "posts/Text_Classification.html#error-analyze",
+    "href": "posts/Text_Classification.html#error-analyze",
+    "title": "NLP Text Classification Fine Tuning",
+    "section": "7. Error analyze",
+    "text": "7. Error analyze\n\nfrom torch.nn.functional import cross_entropy\n\ndef forward_pass_with_label(batch):\n    # 모든 입력 텐서를 모델과 같은 장치로 이동합니다.\n    inputs = {k:v.to(device) for k,v in batch.items()\n              if k in tokenizer.model_input_names}\n\n    with torch.no_grad(): # 역전파를 사용하지 않음 (평가 단계이므로)\n        output = model(**inputs) # 입력 데이터를 모델에 전달\n        pred_label = torch.argmax(output.logits, axis=-1) # 가장 높은 점수를 가진 클래스 선택\n        loss = cross_entropy(output.logits, batch[\"label\"].to(device), # loss 계산\n                             reduction=\"none\") # 평균을 내지 않고 개별 샘플의 손실을 반환\n\n    return {\"loss\": loss.cpu().numpy(), # 결과를 CPU로 이동 및 numpy 배열로 변환 # PyTorch 텐서는 dataset에서 다루기 어렵다.\n            \"predicted_label\": pred_label.cpu().numpy()}\n\n\n# 데이터셋을 다시 파이토치 텐서로 변환\nemotions_encoded.set_format(\"torch\",\n                            columns=[\"input_ids\", \"attention_mask\", \"label\"])\n# 손실 값을 계산\nemotions_encoded[\"validation\"] = emotions_encoded[\"validation\"].map(\n    forward_pass_with_label, batched=True, batch_size=16)\n\n- 코드 설명 1. 모든 입력 텐서가 모델과 같아야 계산이 가능하기에 같은 장치로 이동 2. 입력 데이터를 **inputs으로 모델에 전달 후 가장 높은 logits값을 가진 클래스를 선택한다. 3. 이제 loss를 계산하고 평균을 내지 않는 이유는 label마다 loss값의 편차가 있는 것을 확인하기 위해 평균을 내지 않는다. 4. 결과를 numpy로 변환. (datasets.map() 함수는 PyTorch 텐서 대신 리스트나 NumPy 배열을 반환해야 함.) 5. 손실값을 계산하기 위해 PyTorch 텐서로 전환한다. (batch형태로 계산하기 위해서)"
+  },
+  {
+    "objectID": "posts/Text_Classification.html#int---str-변환",
+    "href": "posts/Text_Classification.html#int---str-변환",
+    "title": "NLP Text Classification Fine Tuning",
+    "section": "8. int -> str 변환",
+    "text": "8. int -&gt; str 변환\n\ndef label_int2str(row):\n    return emotions[\"train\"].features[\"label\"].int2str(row)\n\nemotions_encoded.set_format(\"pandas\")\ncols = [\"text\", \"label\", \"predicted_label\", \"loss\"]\ndf_test = emotions_encoded[\"validation\"][:][cols]\ndf_test[\"label\"] = df_test[\"label\"].apply(label_int2str)\ndf_test[\"predicted_label\"] = (df_test[\"predicted_label\"]\n                              .apply(label_int2str))\n\n\ndf_test.sort_values(\"loss\", ascending=False).head(10)\n\n\ndf_test.sort_values(\"loss\", ascending=True).head(10)\n\n- 코드 설명 1. label에 있는 int형 값들을 사람이 알아보기 쉽게 str형태로 바꿔준다. 2. 결과를 살펴보면 sadness 레이블들은 loss도 적고 잘 맞추는 것을 알 수 있다."
+  },
+  {
+    "objectID": "posts/Text_Classification.html#save-model-publish",
+    "href": "posts/Text_Classification.html#save-model-publish",
+    "title": "NLP Text Classification Fine Tuning",
+    "section": "9. Save model & Publish",
+    "text": "9. Save model & Publish\n\ntrainer.push_to_hub(commit_message=\"Training completed!\")\n\n\nfrom transformers import pipeline\n\nmodel_id = \"SangJinCha/distilbert-base-uncased-finetuned-emotion\"\nclassifier = pipeline(\"text-classification\", model=model_id)\n\n이제 모델에 hugging face 사용자 이름을 붙혀서 push 해주면 된다."
+  }
+]
