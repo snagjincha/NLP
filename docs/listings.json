@@ -2,10 +2,12 @@
   {
     "listing": "/index.html",
     "items": [
+      "/posts/Based_on_Encoder.html",
       "/posts/Based_on_Decoder.html",
       "/posts/P_vs_P.html",
       "/posts/About_Transformers.html",
       "/posts/Text_generation.html",
+      "/posts/NLP_Sampling.html",
       "/posts/Text_Classification.html",
       "/posts/Evaluate.html"
     ]

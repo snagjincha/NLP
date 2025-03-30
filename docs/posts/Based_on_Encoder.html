@@ -1,0 +1,1856 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.4.552">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="차상진">
+<meta name="dcterms.date" content="2025-03-30">
+
+<title>. - Base on Encoder models</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+<script src="https://unpkg.com/@jupyter-widgets/html-manager@*/dist/embed-amd.js" crossorigin="anonymous"></script>
+
+
+<link rel="stylesheet" href="../styles.css">
+</head>
+
+<body class="nav-fixed fullcontent">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">.</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../about.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com"> <i class="bi bi-twitter" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+          <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Base on Encoder models</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>차상진 </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">March 30, 2025</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="classification-model" class="level1">
+<h1>1. Classification model</h1>
+<div id="9441f648-a536-4fee-8b65-a7ff39fa3680" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> transformers <span class="im">import</span> AutoTokenizer, AutoModelForSequenceClassification</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>model_name <span class="op">=</span> <span class="st">"klue/bert-base"</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>tokenizer <span class="op">=</span> AutoTokenizer.from_pretrained(model_name)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> AutoModelForSequenceClassification.from_pretrained(model_name, num_labels<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>model</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Some weights of the model checkpoint at klue/bert-base were not used when initializing BertForSequenceClassification: ['cls.predictions.decoder.bias', 'cls.predictions.transform.dense.bias', 'cls.predictions.transform.dense.weight', 'cls.seq_relationship.bias', 'cls.predictions.transform.LayerNorm.weight', 'cls.seq_relationship.weight', 'cls.predictions.transform.LayerNorm.bias', 'cls.predictions.decoder.weight', 'cls.predictions.bias']
+- This IS expected if you are initializing BertForSequenceClassification from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
+- This IS NOT expected if you are initializing BertForSequenceClassification from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+Some weights of BertForSequenceClassification were not initialized from the model checkpoint at klue/bert-base and are newly initialized: ['classifier.weight', 'classifier.bias']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="2">
+<pre><code>BertForSequenceClassification(
+  (bert): BertModel(
+    (embeddings): BertEmbeddings(
+      (word_embeddings): Embedding(32000, 768, padding_idx=0)
+      (position_embeddings): Embedding(512, 768)
+      (token_type_embeddings): Embedding(2, 768)
+      (LayerNorm): LayerNorm((768,), eps=1e-12, elementwise_affine=True)
+      (dropout): Dropout(p=0.1, inplace=False)
+    )
+    (encoder): BertEncoder(
+      (layer): ModuleList(
+        (0-11): 12 x BertLayer(
+          (attention): BertAttention(
+            (self): BertSelfAttention(
+              (query): Linear(in_features=768, out_features=768, bias=True)
+              (key): Linear(in_features=768, out_features=768, bias=True)
+              (value): Linear(in_features=768, out_features=768, bias=True)
+              (dropout): Dropout(p=0.1, inplace=False)
+            )
+            (output): BertSelfOutput(
+              (dense): Linear(in_features=768, out_features=768, bias=True)
+              (LayerNorm): LayerNorm((768,), eps=1e-12, elementwise_affine=True)
+              (dropout): Dropout(p=0.1, inplace=False)
+            )
+          )
+          (intermediate): BertIntermediate(
+            (dense): Linear(in_features=768, out_features=3072, bias=True)
+          )
+          (output): BertOutput(
+            (dense): Linear(in_features=3072, out_features=768, bias=True)
+            (LayerNorm): LayerNorm((768,), eps=1e-12, elementwise_affine=True)
+            (dropout): Dropout(p=0.1, inplace=False)
+          )
+        )
+      )
+    )
+    (pooler): BertPooler(
+      (dense): Linear(in_features=768, out_features=768, bias=True)
+      (activation): Tanh()
+    )
+  )
+  (dropout): Dropout(p=0.1, inplace=False)
+  (classifier): Linear(in_features=768, out_features=2, bias=True)
+)</code></pre>
+</div>
+</div>
+<p><code>-</code> 클래스가 잘 설정되었는지 확인</p>
+<div id="27a193b1-9251-48dc-9383-a178c0a5c430" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>model.config.id2label</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="3">
+<pre><code>{0: 'LABEL_0', 1: 'LABEL_1'}</code></pre>
+</div>
+</div>
+</section>
+<section id="dataset" class="level1">
+<h1>1-2. Dataset</h1>
+<div id="5dbdb6f3-02b0-46d6-a99b-d1d841344b1f" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> datasets <span class="im">import</span> load_dataset</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>dataset <span class="op">=</span> load_dataset(<span class="st">'klue'</span>,<span class="st">'sts'</span>)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>dataset[<span class="st">'train'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="5">
+<pre><code>Dataset({
+    features: ['guid', 'source', 'sentence1', 'sentence2', 'labels'],
+    num_rows: 11668
+})</code></pre>
+</div>
+</div>
+<div id="6b6229a8-e787-4e02-a90b-1ba080939361" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> process_data(batch):</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    result <span class="op">=</span> tokenizer(batch[<span class="st">'sentence1'</span>], text_pair<span class="op">=</span>batch[<span class="st">'sentence2'</span>])</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 데이터 셋이 sentence1,sentence2으로 이루어져 있다는 것을 정확하게 알아야 이런 코드를 작성할 수 있다.</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    <span class="co"># text_pair은 두 문장간의 문장 관계 분석을 위해서 추가되는 옵션이다.</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    result[<span class="st">'labels'</span>] <span class="op">=</span> [l[<span class="st">'binary-label'</span>] <span class="cf">for</span> l <span class="kw">in</span> batch[<span class="st">'labels'</span>]]</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> result</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>dataset <span class="op">=</span> dataset.<span class="bu">map</span>(</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    process_data,</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    batched <span class="op">=</span> <span class="va">True</span>,</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>    remove_columns <span class="op">=</span> dataset[<span class="st">'train'</span>].column_names)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="c2663781-76b6-43b1-9f49-37d96332545b" class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> transformers <span class="im">import</span> DataCollatorWithPadding</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>collator <span class="op">=</span> DataCollatorWithPadding(tokenizer)</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>batch <span class="op">=</span> collator([dataset[<span class="st">'train'</span>][l] <span class="cf">for</span> l <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">10</span>)])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="prediction" class="level2">
+<h2 class="anchored" data-anchor-id="prediction">1-3. Prediction</h2>
+<div id="c1cf260e-4a87-479c-a5fe-b82807265d0b" class="cell" data-execution_count="17">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> torch.no_grad():</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    logits <span class="op">=</span> model(<span class="op">**</span>batch).logits</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>logits</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="17">
+<pre><code>tensor([[-0.6647,  0.5699],
+        [ 0.2459, -0.5885],
+        [-0.3337,  0.2817],
+        [ 0.1649,  0.0235],
+        [-0.5286,  0.4380],
+        [ 0.7408,  0.0513],
+        [-0.3665,  0.6204],
+        [ 0.6414, -0.6416],
+        [ 0.1279, -0.2553],
+        [-0.3801,  0.3907]])</code></pre>
+</div>
+</div>
+<div id="cf6e990c-04bc-4121-a1db-b9813fd099f6" class="cell" data-execution_count="18">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>pred_labels <span class="op">=</span> logits.argmax(dim<span class="op">=</span><span class="dv">1</span>).cpu().numpy()</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>true_labels <span class="op">=</span> batch[<span class="st">'labels'</span>].numpy()</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(pred_labels)</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(true_labels)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1 0 1 0 1 0 1 0 0 1]
+[1 0 0 0 1 0 1 0 0 1]</code></pre>
+</div>
+</div>
+<div id="8df8d71d-556a-434a-a6ab-6553836eee2b" class="cell" data-execution_count="19">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> evaluate</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>f1 <span class="op">=</span> evaluate.load(<span class="st">'f1'</span>)</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>f1.compute(predictions <span class="op">=</span> pred_labels, references <span class="op">=</span> true_labels, average<span class="op">=</span><span class="st">'micro'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="19">
+<pre><code>{'f1': 0.9}</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="regression-model" class="level1">
+<h1>2. Regression model</h1>
+<p><code>-</code> 분류 모델이 반환하는 것은 ’확률’이 아니라 ’로짓(logits)’이다.</p>
+<ul>
+<li>일반적으로 분류모델은 마지막 층에서 softmax를 적용하지 않는다. 대신 logits, 즉 스케일링되지 않은 점수 값을 반환한다. 위에서 말한 스케일링의 의미는 통계학에서의 표준화와는 다른 개념이다. 여기서 말하는 스케일링은 0과 1 사이의 확률값으로 변환하는 softmax이다. 통계학에서 표준화는 평균이 0이고 분산이 1이 되도록 만드는 것이다. 머신러닝에서는 sciket-learn의 MinMaxScaler는 softmax이고, StandardScaler은 통계학의 표준화이다.</li>
+</ul>
+<p>그렇다면 왜 softmax를 적용하지 않고 logits 값만 반환할까? - 수치적으로 더 안정적이고 loss 계산이 더 쉽기 때문이다. - 만약 로짓 값이 매우 큰 경우(예: 1000, 2000)라면, 소프트맥스 계산 중에 <strong>지수 함수(exp(x))</strong>로 변환하면 매우 큰 숫자가 나오고, 이는 컴퓨터에서 처리할 수 있는 범위를 넘을 수 있다. - 손실함수(ex.Cross Entropy Loss)에 logits이 아니라 softmax로 계산된 확률값을 넣는다면 값이 너무 작아지는 underflow가 일어날 수 있기 때문이다.</p>
+<p><code>-</code> Sequence Classification에서 num_labels = 1으로 설정하면 연속적인 실수를 예측하는 회귀(Regression) 문제에 사용이 가능하다.</p>
+<ul>
+<li>출력 차원이 1인 로짓 값이 나오는데, 이 값은 회귀 문제의 예측값이 될 수 있다.</li>
+<li>num_labels=1으로 설정하면 자동으로 회귀 태스크로 인식하여 크로스 엔트로피가 아닌 MSE를 사용한다.</li>
+</ul>
+<div id="79dfac7c-7c11-4179-86c0-cb13b1ccbb65" class="cell" data-execution_count="20">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> transformers <span class="im">import</span> AutoTokenizer, BertForSequenceClassification</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>tokenizer <span class="op">=</span> AutoTokenizer.from_pretrained(<span class="st">"klue/bert-base"</span>)</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> BertForSequenceClassification.from_pretrained(<span class="st">"klue/bert-base"</span>, num_labels<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Some weights of the model checkpoint at klue/bert-base were not used when initializing BertForSequenceClassification: ['cls.predictions.decoder.bias', 'cls.predictions.transform.dense.bias', 'cls.predictions.transform.dense.weight', 'cls.seq_relationship.bias', 'cls.predictions.transform.LayerNorm.weight', 'cls.seq_relationship.weight', 'cls.predictions.transform.LayerNorm.bias', 'cls.predictions.decoder.weight', 'cls.predictions.bias']
+- This IS expected if you are initializing BertForSequenceClassification from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
+- This IS NOT expected if you are initializing BertForSequenceClassification from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+Some weights of BertForSequenceClassification were not initialized from the model checkpoint at klue/bert-base and are newly initialized: ['classifier.weight', 'classifier.bias']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>BertForSequenceClassification(
+  (bert): BertModel(
+    (embeddings): BertEmbeddings(
+      (word_embeddings): Embedding(32000, 768, padding_idx=0)
+      (position_embeddings): Embedding(512, 768)
+      (token_type_embeddings): Embedding(2, 768)
+      (LayerNorm): LayerNorm((768,), eps=1e-12, elementwise_affine=True)
+      (dropout): Dropout(p=0.1, inplace=False)
+    )
+    (encoder): BertEncoder(
+      (layer): ModuleList(
+        (0-11): 12 x BertLayer(
+          (attention): BertAttention(
+            (self): BertSelfAttention(
+              (query): Linear(in_features=768, out_features=768, bias=True)
+              (key): Linear(in_features=768, out_features=768, bias=True)
+              (value): Linear(in_features=768, out_features=768, bias=True)
+              (dropout): Dropout(p=0.1, inplace=False)
+            )
+            (output): BertSelfOutput(
+              (dense): Linear(in_features=768, out_features=768, bias=True)
+              (LayerNorm): LayerNorm((768,), eps=1e-12, elementwise_affine=True)
+              (dropout): Dropout(p=0.1, inplace=False)
+            )
+          )
+          (intermediate): BertIntermediate(
+            (dense): Linear(in_features=768, out_features=3072, bias=True)
+          )
+          (output): BertOutput(
+            (dense): Linear(in_features=3072, out_features=768, bias=True)
+            (LayerNorm): LayerNorm((768,), eps=1e-12, elementwise_affine=True)
+            (dropout): Dropout(p=0.1, inplace=False)
+          )
+        )
+      )
+    )
+    (pooler): BertPooler(
+      (dense): Linear(in_features=768, out_features=768, bias=True)
+      (activation): Tanh()
+    )
+  )
+  (dropout): Dropout(p=0.1, inplace=False)
+  (classifier): Linear(in_features=768, out_features=1, bias=True)
+)</code></pre>
+</div>
+</div>
+<section id="predcition" class="level2">
+<h2 class="anchored" data-anchor-id="predcition">2-2. Predcition</h2>
+<div id="cdb51a3b-9d76-42fe-9a48-b8eb32e06f13" class="cell" data-execution_count="21">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> torch.no_grad():</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>    logits <span class="op">=</span> model(<span class="op">**</span>batch).logits</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>logits</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="21">
+<pre><code>tensor([[-0.0012],
+        [-0.2672],
+        [ 0.1028],
+        [-0.3430],
+        [-0.0204],
+        [-0.2547],
+        [ 0.0901],
+        [-0.6130],
+        [-0.4369],
+        [ 0.0066]])</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="multiple-choice-model" class="level1">
+<h1>3. Multiple Choice model</h1>
+<p><code>-</code> 여러 개의 입력이 주어졌을 때, 주어진 문장 중 옳은 문장을 고르는 객관식 문제.</p>
+<p>ex) 일반적인 객관식 문제</p>
+<p>Q: 뉴턴의 운동 법칙 중 첫 번째 법칙은 무엇인가?</p>
+<ol type="A">
+<li><p>힘은 질량과 가속도의 곱이다.</p></li>
+<li><p>모든 물체는 외부에서 힘이 가해지지 않는 한 정지 또는 등속 운동을 유지한다.</p></li>
+<li><p>모든 작용에는 크기가 같고 반대 방향인 반작용이 있다.</p></li>
+<li><p>에너지는 생성되거나 소멸되지 않고 변환될 뿐이다.</p></li>
+</ol>
+<p>정답: (B)</p>
+<p>Multiple Choice에서 트랜스포머 모델은 강력하다.</p>
+<p>트랜스포머는 문장이 길어질수록 연산량이 제곱으로 증가한다 (self-attention 과정)</p>
+<p>즉 트랜스포머는 긴 문장을 처리하는 것보다 여러 개의 짧은 문장을 처리하는 게 연산량 측면에서 유리하다.</p>
+<p>그런데 Multiple Choice은 짧은 답변이 여러 개여서 계산이 쉽다.</p>
+<div id="196e0e40-4f1a-4508-8d90-56e5de0710c7" class="cell" data-execution_count="81">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> transformers <span class="im">import</span> AutoTokenizer, AutoModelForMultipleChoice</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>model_name <span class="op">=</span> <span class="st">'klue/bert-base'</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>tokenizer <span class="op">=</span> AutoTokenizer.from_pretrained(model_name)</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> AutoModelForMultipleChoice.from_pretrained(model_name)</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>model</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Some weights of the model checkpoint at klue/bert-base were not used when initializing BertForMultipleChoice: ['cls.predictions.decoder.bias', 'cls.predictions.transform.dense.bias', 'cls.predictions.transform.dense.weight', 'cls.seq_relationship.bias', 'cls.predictions.transform.LayerNorm.weight', 'cls.seq_relationship.weight', 'cls.predictions.transform.LayerNorm.bias', 'cls.predictions.decoder.weight', 'cls.predictions.bias']
+- This IS expected if you are initializing BertForMultipleChoice from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
+- This IS NOT expected if you are initializing BertForMultipleChoice from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+Some weights of BertForMultipleChoice were not initialized from the model checkpoint at klue/bert-base and are newly initialized: ['classifier.weight', 'classifier.bias']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="81">
+<pre><code>BertForMultipleChoice(
+  (bert): BertModel(
+    (embeddings): BertEmbeddings(
+      (word_embeddings): Embedding(32000, 768, padding_idx=0)
+      (position_embeddings): Embedding(512, 768)
+      (token_type_embeddings): Embedding(2, 768)
+      (LayerNorm): LayerNorm((768,), eps=1e-12, elementwise_affine=True)
+      (dropout): Dropout(p=0.1, inplace=False)
+    )
+    (encoder): BertEncoder(
+      (layer): ModuleList(
+        (0-11): 12 x BertLayer(
+          (attention): BertAttention(
+            (self): BertSelfAttention(
+              (query): Linear(in_features=768, out_features=768, bias=True)
+              (key): Linear(in_features=768, out_features=768, bias=True)
+              (value): Linear(in_features=768, out_features=768, bias=True)
+              (dropout): Dropout(p=0.1, inplace=False)
+            )
+            (output): BertSelfOutput(
+              (dense): Linear(in_features=768, out_features=768, bias=True)
+              (LayerNorm): LayerNorm((768,), eps=1e-12, elementwise_affine=True)
+              (dropout): Dropout(p=0.1, inplace=False)
+            )
+          )
+          (intermediate): BertIntermediate(
+            (dense): Linear(in_features=768, out_features=3072, bias=True)
+          )
+          (output): BertOutput(
+            (dense): Linear(in_features=3072, out_features=768, bias=True)
+            (LayerNorm): LayerNorm((768,), eps=1e-12, elementwise_affine=True)
+            (dropout): Dropout(p=0.1, inplace=False)
+          )
+        )
+      )
+    )
+    (pooler): BertPooler(
+      (dense): Linear(in_features=768, out_features=768, bias=True)
+      (activation): Tanh()
+    )
+  )
+  (dropout): Dropout(p=0.1, inplace=False)
+  (classifier): Linear(in_features=768, out_features=1, bias=True)
+)</code></pre>
+</div>
+</div>
+<p><code>-</code> 여러 개 중 하나를 고르는 분류임에도 num_labels을 설정하지 않았다.. 왜?</p>
+<ul>
+<li>다른 task와 동일하게 모델 마지막 부분이 classifier 레이어가 하나 추가됐는데, Multiple Choice에서는 sample(문제)당 여러 개의 후보를 각각 문장으로 입력받기에 임베딩 과정을 거치면서 후보 개수, 문장 길이, 임베딩 사이즈로 총 3차원으로 이루어진다.</li>
+<li>여기서 배치처리까지 하면 4차원 데이터를 가지므로 사용이 힘들어진다.</li>
+<li>그래서 flatten을 적용하여 문장을 3차원으로 바꾸고 추론을 하고 다시 원상태 (4차원)로 복구한다.</li>
+<li>flatten된 데이터는 문장당 0~1 사이 확률 값을 하나만 가지면 되므로 자동으로 num_labels 수는 1로 고정된다.</li>
+</ul>
+<p><code>할 수 있는 질문</code></p>
+<p>질문 1. flatten() 하면 1차원이 되는 거 아닌가? 어떻게 3차원이 돼? - 일반적으로 flatten()은 1차원이 되지만 여기서는 특정 축을 기준으로 차원을 줄이는 방식을 사용. - <code>(batch_size, num_choices, seq_length, hidden_dim)</code> -&gt; <code>(batch_size * num_choices, seq_length, hidden_dim)</code></p>
+<p>질문 2. 문장당 0~1 사이 확률값을 하나만 가지면 되므로 num_labels은 1이다? - 보통 분류 태스크에서 num_labels = 3이라고 한다면 softmax를 적용해서 여러 클래스 중 하나를 선택 (클래스 별로 확률을 출력함) - Multiple Choice는 정답일 확률만 출력하면 된다. 그 중 가장 큰 것을 선택하면 됨. 즉, 문장 하나에 대해 스칼라 값 하나만 출력하면 되므로 num_labes = 1이다. (회귀 문제와 같다.)</p>
+<section id="문장분류-vs-다중-분류" class="level2">
+<h2 class="anchored" data-anchor-id="문장분류-vs-다중-분류">문장분류 vs 다중 분류</h2>
+<p>문장 분류: <strong>문장 한 개당 N개의 확률 출력</strong> (N = 클래스의 수)</p>
+<p>다중 분류: <strong>N개의 문장을 입력받아 문장당 한 개씩, 총 N개 확률 추출</strong> (N = 객관식 보기 개수)</p>
+</section>
+<section id="dataset-1" class="level2">
+<h2 class="anchored" data-anchor-id="dataset-1">3-2. Dataset</h2>
+<p>수능 국어 문제</p>
+<div id="01c82a38-7659-4667-a367-2e02a5e9e520" class="cell" data-execution_count="82">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> datasets <span class="im">import</span> load_dataset</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>dataset <span class="op">=</span> load_dataset(<span class="st">"HAERAE-HUB/csatqa"</span>, <span class="st">"full"</span>)</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(dataset[<span class="st">"test"</span>][<span class="dv">0</span>])</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>ending_names <span class="op">=</span> [<span class="st">"option#1"</span>, <span class="st">"option#2"</span>, <span class="st">"option#3"</span>, <span class="st">"option#4"</span>, <span class="st">"option#5"</span>]</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> preprocess_function(examples): <span class="co"># examples 자리에 dataset의 batch가 들어간다.</span></span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>  first_sentences <span class="op">=</span> [</span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>      [context] <span class="op">*</span> <span class="dv">5</span> <span class="cf">for</span> context <span class="kw">in</span> examples[<span class="st">"context"</span>] <span class="co"># 각 문항에 5개의 선택지가 있다. 각 선택지마다 동일한 context를 사용해야함.</span></span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>  ]</span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>  question_headers <span class="op">=</span> examples[<span class="st">"question"</span>]</span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>  second_sentences <span class="op">=</span> [</span>
+<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a>      [<span class="ss">f"</span><span class="sc">{</span>header<span class="sc">}</span><span class="ss"> </span><span class="sc">{</span>examples[end][i]<span class="sc">}</span><span class="ss">"</span> <span class="cf">for</span> end <span class="kw">in</span> ending_names] <span class="cf">for</span> i, header <span class="kw">in</span> <span class="bu">enumerate</span>(question_headers) <span class="co"># 각 질문과 선택지를 하나로 합치는 역할</span></span>
+<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a>      <span class="co"># 1. enumerate(question_headers) → question_headers에서 (index, question_text) 쌍을 가져옴.</span></span>
+<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a>      <span class="co"># 2. for end in ending_names → "option#1" ~ "option#5"까지 돌면서 해당 선택지를 가져옴.</span></span>
+<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a>      <span class="co"># 3. f"{header} {examples[end][i]}" → 각 질문(header)과 해당 선택지를 합친 새로운 문장을 생성.</span></span>
+<span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a>  ]</span>
+<span id="cb24-19"><a href="#cb24-19" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 토큰화를 위해 1차원으로 평활화</span></span>
+<span id="cb24-20"><a href="#cb24-20" aria-hidden="true" tabindex="-1"></a>  first_sentences <span class="op">=</span> <span class="bu">sum</span>(first_sentences, []) <span class="co"># flatten()과 같은 효과. flatten()은 numpy에서 동작하므로 리스트에서는 sum(리스트, []) 사용</span></span>
+<span id="cb24-21"><a href="#cb24-21" aria-hidden="true" tabindex="-1"></a>  second_sentences <span class="op">=</span> <span class="bu">sum</span>(second_sentences, [])</span>
+<span id="cb24-22"><a href="#cb24-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-23"><a href="#cb24-23" aria-hidden="true" tabindex="-1"></a>  <span class="co"># None 데이터 처리</span></span>
+<span id="cb24-24"><a href="#cb24-24" aria-hidden="true" tabindex="-1"></a>  first_sentences <span class="op">=</span> [i <span class="cf">if</span> i <span class="cf">else</span> <span class="st">""</span> <span class="cf">for</span> i <span class="kw">in</span> first_sentences] <span class="co"># sentences에서 None을 공백으로 바꾸는 코드. 즉, None 데이터를 처리해서 모델이 학습할 수 있게 함</span></span>
+<span id="cb24-25"><a href="#cb24-25" aria-hidden="true" tabindex="-1"></a>  second_sentences <span class="op">=</span> [i <span class="cf">if</span> i <span class="cf">else</span> <span class="st">""</span> <span class="cf">for</span> i <span class="kw">in</span> second_sentences]</span>
+<span id="cb24-26"><a href="#cb24-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-27"><a href="#cb24-27" aria-hidden="true" tabindex="-1"></a>  tokenized_examples <span class="op">=</span> tokenizer(first_sentences, second_sentences, truncation<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb24-28"><a href="#cb24-28" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Multiple Choice 문제에서는 질문 + 각 답변을 결합해야한다. 결합하고 싶은 문장을 이어서 작성한다면 알아서 결합된다.</span></span>
+<span id="cb24-29"><a href="#cb24-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-30"><a href="#cb24-30" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 토큰화 후 다시 2차원으로 재배열</span></span>
+<span id="cb24-31"><a href="#cb24-31" aria-hidden="true" tabindex="-1"></a>  result <span class="op">=</span> {</span>
+<span id="cb24-32"><a href="#cb24-32" aria-hidden="true" tabindex="-1"></a>      k: [v[i:i<span class="op">+</span><span class="dv">5</span>] <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">0</span>, <span class="bu">len</span>(v), <span class="dv">5</span>)] <span class="cf">for</span> k, v <span class="kw">in</span> tokenized_examples.items()</span>
+<span id="cb24-33"><a href="#cb24-33" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb24-34"><a href="#cb24-34" aria-hidden="true" tabindex="-1"></a>  result[<span class="st">"labels"</span>] <span class="op">=</span> [i<span class="op">-</span><span class="dv">1</span> <span class="cf">for</span> i <span class="kw">in</span> examples[<span class="st">"gold"</span>]]  <span class="co"># k는 문제(문제와 보기), v는 선택지 5개이다. 보기 좋은 2차원 배열로 재배열</span></span>
+<span id="cb24-35"><a href="#cb24-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-36"><a href="#cb24-36" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> result</span>
+<span id="cb24-37"><a href="#cb24-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-38"><a href="#cb24-38" aria-hidden="true" tabindex="-1"></a>tokenized_dataset <span class="op">=</span> dataset.<span class="bu">map</span>(preprocess_function, batched<span class="op">=</span><span class="va">True</span>, remove_columns<span class="op">=</span>dataset[<span class="st">"test"</span>].column_names)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>{'question': ' 이 이야기에서 얻을 수 있는 교훈으로 가장 적절한 것은?', 'context': '이제 한 편의 이야기를 들려 드립니다. 잘 듣고 물음에 답하십시오.\n자, 여러분! 안녕하십니까? 오늘은 제가 어제 꾼 꿈 이야기 하날 들려 드리겠습니다. 전 꿈속에서 낯선 거리를 걷고 있었습니다. 그러다가 홍미로운 간판을 발견했답니다. 행 복을 파는 가게. 그렇게 쓰여 있었습니다. 전 호기심으로 문을 열고 들어갔답니다. 그곳 에서는 한 노인이 물건을 팔고 있었습니다. 전 잠시 머뭇거리다가 노인에게 다가가서 물 었습니다. 여기서는 무슨 물건을 파느냐고요. 노인은 미소를 지으며, 원하는 것은 뭐든 다 살 수 있다고 말했습니다. 저는 제 귀를 의심했습니다. \'무엇이든 다?\' 전 무엇을 사야 할까 생각하다가 말했답니다. "사랑, 부귀 그리고 지혜하고 건강도 사고 싶습니다. 저 자신뿐 아니라 우리 가족 모두 를 위해서요. 지금 바로 살 수 있나요?" 그러자 노인은 빙긋이 웃으며 대답했습니다. "젊은이, 한번 잘 보게나. 여기에서 팔고 있는 것은 무르익은 과일이 아니라 씨앗이라 네. 앞으로 좋은 열매를 맺으려면 이 씨앗들을 잘 가꾸어야 할 걸세."', 'option#1': '새로운 세계에 대한 열망을 가져야 한다.', 'option#2': '주어진 기회를 능동적으로 활용해야 한다.', 'option#3': '큰 것을 얻으려면 작은 것은 버려야 한다.', 'option#4': '물질적 가치보다 정신적 가치를 중시해야 한다.', 'option#5': '소망하는 바를 성취하기 위해서는 노력을 해야 한다.', 'gold': 5, 'category': 'N/A', 'human_performance': 0.0}</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id":"77f29dd109c54b5c93f9513ca0cfb089","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
+</script>
+</div>
+</div>
+<p>다중 분류 task에서는 일반적으로 사용하는 DataCollatorWithPadding을 사용하기 어렵다.</p>
+<p>이를 위해 패딩 등 필요한 작업을 진행하는 콜레이터를 직접 작성해야한다.</p>
+<p>그 전 작성된 콜레이터를 이해하기 위해선 아래의 문법을 알아야한다. 간략하게 설명할테니 숙지하고 넘어가도록 하자.</p>
+</section>
+<section id="번외1.-파이썬-문법" class="level2">
+<h2 class="anchored" data-anchor-id="번외1.-파이썬-문법">번외1. 파이썬 문법</h2>
+<ol type="1">
+<li><code>__init__()</code></li>
+</ol>
+<p>객체 지향 프로그래밍에서 클래스를 만들면 해당 클래스의 <strong>객체(인스턴스)</strong>를 생성할 때 자동으로 호출되는 메서드가 <code>__init__()</code>이다.</p>
+<div id="4268b27b-1416-4efb-95d8-dcdc723a2c01" class="cell" data-execution_count="40">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Example:</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, a, b):</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.a <span class="op">=</span> a</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.b <span class="op">=</span> b</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>예를 들어 위와 같은 클래스를 만든다고 했을 때, <code>__init__()</code> 메서드는 클래스를 처음 만들 때 자동으로 실행된다.</p>
+<p><code>self.a = a</code> -&gt; <code>a</code>값을 객체 내부에 저장</p>
+<p><code>self.b = b</code> -&gt; <code>b</code>값을 객체 내부에 저장</p>
+<div id="1cfcf3fb-bd87-4e6f-b4e5-b3290a54d7e4" class="cell" data-execution_count="41">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>obj <span class="op">=</span> Example(<span class="dv">3</span>,<span class="dv">5</span>)</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(obj.a)</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(obj.b)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>3
+5</code></pre>
+</div>
+</div>
+<p>즉 <code>__init__()</code>은 클래스를 만들 때 필요한 변수를 초기화하는 역할을 한다.</p>
+<ol start="2" type="1">
+<li><code>데코레이터</code> + <code>dataclass</code></li>
+</ol>
+<p><strong>데코레이터(Decorator)</strong> 는 함수나 클래스를 꾸며주는(변형하는) 함수이다. <code>@</code>을 붙혀서 사용한다. <code>@dataclass</code>는 클래스에서 <code>__init__()</code>을 자동으로 만들어주는 역할을 한다.</p>
+<div id="a678b46b-02db-4b2b-ad55-ab2be161e71b" class="cell" data-execution_count="42">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> dataclasses <span class="im">import</span> dataclass</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a><span class="at">@dataclass</span></span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Example:</span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>    a: <span class="bu">int</span></span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>    b: <span class="bu">int</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>위의 코드에서 <code>__init__()</code>을 따로 만들지 않았음에도 자동 생성되었고 내부적으로는 아래의 코드와 같은 방식이다.</p>
+<div id="d04031e7-4e91-4c9c-ae87-9ba80b8e5518" class="cell" data-execution_count="43">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, a:<span class="bu">int</span>, b:<span class="bu">int</span>):</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>    <span class="va">self</span>.a <span class="op">=</span> a</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>    <span class="va">self</span>.b <span class="op">=</span> b</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>추가적으로 <code>a: int, b: int</code> 와 같이 쓴 이유는 a와 b는 int 타입을 기대한다는 것을 알리기 위해 사용한 것이다.</p>
+<p>하지만 <strong>a는 정수여야 한다</strong> 는 아니므로 float을 입력해도 에러는 나지 않는다.</p>
+<p>즉, 권장사항이다.</p>
+<p><code>@dataclass</code> 말고도 <code>@attrs</code> 등 많은 기능을 제공하는 다른 라이브러리들이 많다. 필요한 것을 골라서 사용하면 된다.</p>
+</section>
+<section id="번외-2.union-optional" class="level2">
+<h2 class="anchored" data-anchor-id="번외-2.union-optional">번외 2.<code>Union</code>, <code>Optional</code>?</h2>
+<ol type="1">
+<li><code>Union</code></li>
+</ol>
+<p><code>Union</code>과 <code>Optional</code>은 <strong>타입 힌트</strong> 에서 사용되는 개념이다. Python의 타입 시스템에서 변수나 함수가 가질 수 있는 값을 더 명확하게 지정하는데 사용된다.</p>
+<ul>
+<li><code>Union</code>
+<ul>
+<li><code>Union</code>은 “이 변수는 여러 타입 중 하나일 수 있다” 는 뜻이다. 예를 들어 <code>Union[int,float]</code>이라면 해당 변수나 값이 <code>int</code>일 수도 있고 <code>float</code>일 수도 있다는 것을 의미함</li>
+</ul></li>
+</ul>
+<div id="21e3ac1a-c894-4dbf-993c-78922d8d82ad" class="cell" data-execution_count="74">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> foo(x: Union[<span class="bu">int</span>, <span class="bu">float</span>]) <span class="op">-&gt;</span> <span class="va">None</span>:</span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(x)</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(foo(<span class="bu">int</span>)) <span class="co"># 당연히 가능</span></span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(foo(<span class="bu">float</span>)) <span class="co"># 당연히 가능</span></span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(foo(<span class="bu">bool</span>)) <span class="co"># int,float이 제한사항이 아니라 권장사항이므로 bool도 당연히 된다.</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>&lt;class 'int'&gt;
+None
+&lt;class 'float'&gt;
+None
+&lt;class 'bool'&gt;
+None</code></pre>
+</div>
+</div>
+<ol start="2" type="1">
+<li><code>Optional</code></li>
+</ol>
+<ul>
+<li><code>Optional</code>
+<ul>
+<li>‘Optional[X]’ = <code>Union[X, None]</code> 즉, 해당 값이 <code>X</code>일 수도 있고, <code>None</code>일 수도 있다는 의미이다.</li>
+<li>’Optional’을 사용하면 값이 <code>None</code>일 수 있다는 것을 명시적으로 나타낼 수 있다.</li>
+</ul></li>
+</ul>
+<div id="4a34e9ce-e10a-4208-9c68-60ab74270d1f" class="cell" data-execution_count="75">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> foo(x: Optional[<span class="bu">int</span>]) <span class="op">-&gt;</span> <span class="va">None</span>:</span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(x)</span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(foo(<span class="bu">int</span>)) <span class="co"># 당연히 가능</span></span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(foo(<span class="bu">float</span>)) <span class="co"># 당연히 가능</span></span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(foo(<span class="bu">bool</span>)) <span class="co"># int,float이 제한사항이 아니라 권장사항이므로 bool도 당연히 된다.</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>&lt;class 'int'&gt;
+None
+&lt;class 'float'&gt;
+None
+&lt;class 'bool'&gt;
+None</code></pre>
+</div>
+</div>
+</section>
+<section id="collator" class="level2">
+<h2 class="anchored" data-anchor-id="collator">3-3. Collator</h2>
+<p><code>Collator</code>는 배치를 만들기 위한 객체이고 <code>batch</code>는 그 결과물이다.</p>
+<p><code>batcg</code>를 <code>model(**batch)</code>로 넣으면 콜레이터에서 변경된 데이터 형식도 그대로 반영된다.</p>
+<div id="f0765d3f-0cfc-4418-8ce6-c86afa94f2cb" class="cell" data-execution_count="83">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> dataclasses <span class="im">import</span> dataclass</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> transformers.tokenization_utils_base <span class="im">import</span> PreTrainedTokenizerBase, PaddingStrategy</span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> typing <span class="im">import</span> Optional, Union</span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch</span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a><span class="at">@dataclass</span> <span class="co"># 데코레이터</span></span>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a><span class="co"># @dataclass -&gt; __init__을 자동으로 생성해주는 데이터 클래스</span></span>
+<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Collator는 data loader에서 batch를 구성할 때 사용. 일반적인 Collator를 padding과 tensor변환 담당</span></span>
+<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a><span class="co"># 하지만 다중 선택 문제에서는 input_ids가 2차원 구조이기에 일반적인 Collator를 사용할 수 없음.</span></span>
+<span id="cb35-11"><a href="#cb35-11" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> DataCollatorForMultipleChoice:</span>
+<span id="cb35-12"><a href="#cb35-12" aria-hidden="true" tabindex="-1"></a>  tokenizer: PreTrainedTokenizerBase <span class="co"># 실제로 모델에 입력되는 데이터를 토크나이저로 변환하는 도구.</span></span>
+<span id="cb35-13"><a href="#cb35-13" aria-hidden="true" tabindex="-1"></a>  padding: Union[<span class="bu">bool</span>, <span class="bu">str</span>, PaddingStrategy] <span class="op">=</span> <span class="va">True</span> </span>
+<span id="cb35-14"><a href="#cb35-14" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 입력 데이터가 고정 길이를 가지도록 패딩을 추가하는 방법을 정의한다. 기본 값은 True, 필요하면 패딩을 추가한다.</span></span>
+<span id="cb35-15"><a href="#cb35-15" aria-hidden="true" tabindex="-1"></a>  max_length: Optional[<span class="bu">int</span>] <span class="op">=</span> <span class="va">None</span> <span class="co"># 입력 시 최대 길이를 설정한다. max_length를 초과하는 토큰은 잘린다.</span></span>
+<span id="cb35-16"><a href="#cb35-16" aria-hidden="true" tabindex="-1"></a>  pad_to_multiple_of: Optional[<span class="bu">int</span>] <span class="op">=</span> <span class="va">None</span> <span class="co"># 이 값은 패딩 길이가 특정 수의 배수가 되도록 설정할 수 있다.</span></span>
+<span id="cb35-17"><a href="#cb35-17" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 이 변수들은 클래스를 초기화할 때 설정할 값들로</span></span>
+<span id="cb35-18"><a href="#cb35-18" aria-hidden="true" tabindex="-1"></a>  <span class="kw">def</span> <span class="fu">__call__</span>(<span class="va">self</span>, features): <span class="co"># 클래스의 인스턴스를 함수처럼 호출할 수 있도록 만듦</span></span>
+<span id="cb35-19"><a href="#cb35-19" aria-hidden="true" tabindex="-1"></a>    label_name <span class="op">=</span> <span class="st">"label"</span> <span class="cf">if</span> <span class="st">"label"</span> <span class="kw">in</span> features[<span class="dv">0</span>].keys() <span class="cf">else</span> <span class="st">"labels"</span> <span class="co"># label이나 labels중 하나를 사용해서 레이블 이름을 결정한다.</span></span>
+<span id="cb35-20"><a href="#cb35-20" aria-hidden="true" tabindex="-1"></a>    labels <span class="op">=</span> [feature.pop(label_name) <span class="cf">for</span> feature <span class="kw">in</span> features] <span class="co"># 각 샘플에서 레이블을 꺼내고 pop()으로 레이블을 분리</span></span>
+<span id="cb35-21"><a href="#cb35-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-22"><a href="#cb35-22" aria-hidden="true" tabindex="-1"></a>    batch_size <span class="op">=</span> <span class="bu">len</span>(features) <span class="co"># features의 길이를 통해 한 번에 처리하는 샘플 수(batch_size)를 결정한다</span></span>
+<span id="cb35-23"><a href="#cb35-23" aria-hidden="true" tabindex="-1"></a>    num_choices <span class="op">=</span> <span class="bu">len</span>(features[<span class="dv">0</span>][<span class="st">"input_ids"</span>]) <span class="co"># 각 샘플에 포함된 선택지 수를 결정.</span></span>
+<span id="cb35-24"><a href="#cb35-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-25"><a href="#cb35-25" aria-hidden="true" tabindex="-1"></a>    <span class="co"># multiple choice에서 여러 개의 선택지를 평탄화(flatten)하는 과정</span></span>
+<span id="cb35-26"><a href="#cb35-26" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 첫 번째 리스트 컴프리헨션은 각 샘플에 대해 선택지별로 분리한다.</span></span>
+<span id="cb35-27"><a href="#cb35-27" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 두 번째 리스트 컴프리헨션은 각 샘플에 대해 평탄화하여 하나의 리스트로 만든다.</span></span>
+<span id="cb35-28"><a href="#cb35-28" aria-hidden="true" tabindex="-1"></a>    flattened_features <span class="op">=</span> [</span>
+<span id="cb35-29"><a href="#cb35-29" aria-hidden="true" tabindex="-1"></a>        [</span>
+<span id="cb35-30"><a href="#cb35-30" aria-hidden="true" tabindex="-1"></a>            {k: v[i] <span class="cf">for</span> k, v <span class="kw">in</span> feature.items()}</span>
+<span id="cb35-31"><a href="#cb35-31" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(num_choices)</span>
+<span id="cb35-32"><a href="#cb35-32" aria-hidden="true" tabindex="-1"></a>        ]</span>
+<span id="cb35-33"><a href="#cb35-33" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> feature <span class="kw">in</span> features</span>
+<span id="cb35-34"><a href="#cb35-34" aria-hidden="true" tabindex="-1"></a>    ]</span>
+<span id="cb35-35"><a href="#cb35-35" aria-hidden="true" tabindex="-1"></a>    flattened_features <span class="op">=</span> <span class="bu">sum</span>(flattened_features, []) <span class="co"># 중첩된 리스트를 하나로 합친다.</span></span>
+<span id="cb35-36"><a href="#cb35-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-37"><a href="#cb35-37" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 토큰화를 적용하고 다시 2차원 구조로 변환한다.</span></span>
+<span id="cb35-38"><a href="#cb35-38" aria-hidden="true" tabindex="-1"></a>    <span class="co"># flattened_features 리스트를 self.tokenizer.pad(...)에 넣어서 토큰화 수행, return_tensors = 'pt'를 이용해 파이토치 형식으로 변환</span></span>
+<span id="cb35-39"><a href="#cb35-39" aria-hidden="true" tabindex="-1"></a>    batch <span class="op">=</span> <span class="va">self</span>.tokenizer.pad(</span>
+<span id="cb35-40"><a href="#cb35-40" aria-hidden="true" tabindex="-1"></a>        flattened_features,</span>
+<span id="cb35-41"><a href="#cb35-41" aria-hidden="true" tabindex="-1"></a>        padding<span class="op">=</span><span class="va">self</span>.padding,</span>
+<span id="cb35-42"><a href="#cb35-42" aria-hidden="true" tabindex="-1"></a>        max_length<span class="op">=</span><span class="va">self</span>.max_length,</span>
+<span id="cb35-43"><a href="#cb35-43" aria-hidden="true" tabindex="-1"></a>        pad_to_multiple_of<span class="op">=</span><span class="va">self</span>.pad_to_multiple_of,</span>
+<span id="cb35-44"><a href="#cb35-44" aria-hidden="true" tabindex="-1"></a>        return_tensors<span class="op">=</span><span class="st">"pt"</span>,</span>
+<span id="cb35-45"><a href="#cb35-45" aria-hidden="true" tabindex="-1"></a>    ) <span class="co"># 이렇게 하면 각 선택지가 개별적으로 패딩되어, 입력 길이가 맞춰진다.</span></span>
+<span id="cb35-46"><a href="#cb35-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-47"><a href="#cb35-47" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 다시 배치 크기 * 선택지 개수형태로 복구한다.</span></span>
+<span id="cb35-48"><a href="#cb35-48" aria-hidden="true" tabindex="-1"></a>    batch <span class="op">=</span> {k: v.view(batch_size, num_choices, <span class="op">-</span><span class="dv">1</span>) <span class="cf">for</span> k, v <span class="kw">in</span> batch.items()} <span class="co"># batch_size(문제) * num_choices(선택지)로 맞추고 -1으로 나머지는 자동으로 맞춘다.</span></span>
+<span id="cb35-49"><a href="#cb35-49" aria-hidden="true" tabindex="-1"></a>    batch[<span class="st">"labels"</span>] <span class="op">=</span> torch.tensor(labels, dtype<span class="op">=</span>torch.int64) <span class="co"># 레이블을 추가하여 정답이 몇 번째 선택지인지 알 수 있게 한다.</span></span>
+<span id="cb35-50"><a href="#cb35-50" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> batch</span>
+<span id="cb35-51"><a href="#cb35-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-52"><a href="#cb35-52" aria-hidden="true" tabindex="-1"></a>collator <span class="op">=</span> DataCollatorForMultipleChoice(tokenizer<span class="op">=</span>tokenizer)</span>
+<span id="cb35-53"><a href="#cb35-53" aria-hidden="true" tabindex="-1"></a>batch <span class="op">=</span> collator([tokenized_dataset[<span class="st">"test"</span>][i] <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">5</span>)])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="ee204585-fddd-48aa-b035-99b3365dfb36" class="cell" data-execution_count="84">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> torch.no_grad():</span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>  logits <span class="op">=</span> model(<span class="op">**</span>batch).logits</span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>logits</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="84">
+<pre><code>tensor([[0.0498, 0.0333, 0.2016, 0.0107, 0.1579],
+        [0.0852, 0.0705, 0.0632, 0.0507, 0.0745],
+        [0.1740, 0.1215, 0.2006, 0.2101, 0.2531],
+        [0.1829, 0.2058, 0.1865, 0.1838, 0.3799],
+        [0.2215, 0.2357, 0.2723, 0.2856, 0.3356]])</code></pre>
+</div>
+</div>
+<p>모델이 Dropout과 같은 랜덤 연산을 포함한다면 같은 모델에 같은 입력을 넣어도 logits 값은 달라진다.</p>
+</section>
+<section id="evaluate" class="level2">
+<h2 class="anchored" data-anchor-id="evaluate">3-4. evaluate</h2>
+<div id="00e5a7a8-59a6-4f4c-905f-2c8128e58be1" class="cell" data-execution_count="85">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> evaluate</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>pred_labels <span class="op">=</span> logits.argmax(dim<span class="op">=</span><span class="dv">1</span>).cpu().numpy()</span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>true_labels <span class="op">=</span> batch[<span class="st">"labels"</span>].numpy()</span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(pred_labels)</span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(true_labels)</span>
+<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a>f1 <span class="op">=</span> evaluate.load(<span class="st">"f1"</span>)</span>
+<span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a>f1.compute(predictions<span class="op">=</span>pred_labels, references<span class="op">=</span>true_labels, average<span class="op">=</span><span class="st">"micro"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[2 0 4 4 4]
+[4 4 0 3 1]</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="85">
+<pre><code>{'f1': 0.0}</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="token-classifiation" class="level1">
+<h1>4.Token Classifiation</h1>
+<p><code>-</code> 말 그대로 토큰 단위로 분류를 진행한다. 주로 문장 내에서 유호한 개체를 추출해 내는 개체명 인식 태스크에서 가장 많이 사용한다.</p>
+<section id="model" class="level2">
+<h2 class="anchored" data-anchor-id="model">4-1. model</h2>
+<p><code>-</code> 베이스 모델은 기본 모델인 모델명PreTrainedModel을 상속하며 <code>모델명ForTokenClassification</code>을 사용한다.</p>
+<p>다만 문장 벡터 차원을 축소하는 풀링 작업을 진행하지 않고 입력된 각 토큰에 모두 출력 헤더를 달아 독립적으로 분류를 진행한다.</p>
+<div id="d480cdf0-9c79-48ca-9854-ec6b66b056f2" class="cell" data-execution_count="86">
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch</span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> transformers <span class="im">import</span> AutoTokenizer, AutoModelForTokenClassification</span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>model_name <span class="op">=</span> <span class="st">"klue/bert-base"</span></span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>tokenizer <span class="op">=</span> AutoTokenizer.from_pretrained(model_name)</span>
+<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> AutoModelForTokenClassification.from_pretrained(model_name)</span>
+<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a>model</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Some weights of the model checkpoint at klue/bert-base were not used when initializing BertForTokenClassification: ['cls.predictions.decoder.bias', 'cls.predictions.transform.dense.bias', 'cls.predictions.transform.dense.weight', 'cls.seq_relationship.bias', 'cls.predictions.transform.LayerNorm.weight', 'cls.seq_relationship.weight', 'cls.predictions.transform.LayerNorm.bias', 'cls.predictions.decoder.weight', 'cls.predictions.bias']
+- This IS expected if you are initializing BertForTokenClassification from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
+- This IS NOT expected if you are initializing BertForTokenClassification from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+Some weights of BertForTokenClassification were not initialized from the model checkpoint at klue/bert-base and are newly initialized: ['classifier.weight', 'classifier.bias']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="86">
+<pre><code>BertForTokenClassification(
+  (bert): BertModel(
+    (embeddings): BertEmbeddings(
+      (word_embeddings): Embedding(32000, 768, padding_idx=0)
+      (position_embeddings): Embedding(512, 768)
+      (token_type_embeddings): Embedding(2, 768)
+      (LayerNorm): LayerNorm((768,), eps=1e-12, elementwise_affine=True)
+      (dropout): Dropout(p=0.1, inplace=False)
+    )
+    (encoder): BertEncoder(
+      (layer): ModuleList(
+        (0-11): 12 x BertLayer(
+          (attention): BertAttention(
+            (self): BertSelfAttention(
+              (query): Linear(in_features=768, out_features=768, bias=True)
+              (key): Linear(in_features=768, out_features=768, bias=True)
+              (value): Linear(in_features=768, out_features=768, bias=True)
+              (dropout): Dropout(p=0.1, inplace=False)
+            )
+            (output): BertSelfOutput(
+              (dense): Linear(in_features=768, out_features=768, bias=True)
+              (LayerNorm): LayerNorm((768,), eps=1e-12, elementwise_affine=True)
+              (dropout): Dropout(p=0.1, inplace=False)
+            )
+          )
+          (intermediate): BertIntermediate(
+            (dense): Linear(in_features=768, out_features=3072, bias=True)
+          )
+          (output): BertOutput(
+            (dense): Linear(in_features=3072, out_features=768, bias=True)
+            (LayerNorm): LayerNorm((768,), eps=1e-12, elementwise_affine=True)
+            (dropout): Dropout(p=0.1, inplace=False)
+          )
+        )
+      )
+    )
+  )
+  (dropout): Dropout(p=0.1, inplace=False)
+  (classifier): Linear(in_features=768, out_features=2, bias=True)
+)</code></pre>
+</div>
+</div>
+<p><code>-</code> (classifier): Linear(in_features=768, out_features=2, bias=True)에서 out_features=2인 이유는 분류되는 클래스의 개수가 2개이기 때문이다. 만약 더 세분화하여 구분되어야한다먼 out_features=?? ??의 수가 더 늘어나야한다.</p>
+</section>
+<section id="dataset-2" class="level2">
+<h2 class="anchored" data-anchor-id="dataset-2">4-2. Dataset</h2>
+<div id="c66d3568-3318-4c7d-8d58-36f3a3cd04d3" class="cell" data-execution_count="87">
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> datasets <span class="im">import</span> load_dataset</span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>dataset <span class="op">=</span> load_dataset(<span class="st">"klue"</span>, <span class="st">"ner"</span>)</span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a>sample <span class="op">=</span> dataset[<span class="st">"train"</span>][<span class="dv">0</span>]</span>
+<span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"tokens : "</span>, sample[<span class="st">"tokens"</span>][: <span class="dv">20</span>])</span>
+<span id="cb44-7"><a href="#cb44-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"ner tags : "</span>, sample[<span class="st">"ner_tags"</span>][: <span class="dv">20</span>])</span>
+<span id="cb44-8"><a href="#cb44-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>((<span class="bu">len</span>(sample[<span class="st">"tokens"</span>]), <span class="bu">len</span>(sample[<span class="st">"tokens"</span>])))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id":"8288307d1c914cbbb60957a90126558e","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
+</script>
+</div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id":"4fed4eec60f34d2ea0a617855acef887","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
+</script>
+</div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id":"da3bad53f0724968b636438bc00f46f5","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
+</script>
+</div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id":"93808980079545f38bcf8cb9c8648d07","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
+</script>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>tokens :  ['특', '히', ' ', '영', '동', '고', '속', '도', '로', ' ', '강', '릉', ' ', '방', '향', ' ', '문', '막', '휴', '게']
+ner tags :  [12, 12, 12, 2, 3, 3, 3, 3, 3, 12, 2, 3, 12, 12, 12, 12, 2, 3, 3, 3]
+(66, 66)</code></pre>
+</div>
+</div>
+<div id="5ec26e51-3ced-43f5-9c14-b19985e24f7c" class="cell" data-scrolled="true" data-execution_count="94">
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> l <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(sample[<span class="st">'ner_tags'</span>])):</span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(sample[<span class="st">'tokens'</span>][l], <span class="st">'</span><span class="ch">\t</span><span class="st">'</span>, sample[<span class="st">'ner_tags'</span>][l])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>특    12
+히    12
+     12
+영    2
+동    3
+고    3
+속    3
+도    3
+로    3
+     12
+강    2
+릉    3
+     12
+방    12
+향    12
+     12
+문    2
+막    3
+휴    3
+게    3
+소    3
+에    12
+서    12
+     12
+만    2
+종    3
+분    3
+기    3
+점    3
+까    12
+지    12
+     12
+5    8
+㎞    9
+     12
+구    12
+간    12
+에    12
+는    12
+     12
+승    12
+용    12
+차    12
+     12
+전    12
+용    12
+     12
+임    12
+시    12
+     12
+갓    12
+길    12
+차    12
+로    12
+제    12
+를    12
+     12
+운    12
+영    12
+하    12
+기    12
+로    12
+     12
+했    12
+다    12
+.    12</code></pre>
+</div>
+</div>
+<p><code>-</code> 문자 단위로 분할된 tokens 칼럼은 이미 ’토큰화’되었다고 할 수 있다. 따라서 문장 인코딩을 진행할 때 평소처럼 토큰화 - 정수 인코딩 과정을 거치지 않고 정수 인코딩 과정만 거치도록 코드를 작성해야한다.</p>
+<div id="8fa1a273-17ef-4013-be5d-9482dbe10303" class="cell" data-execution_count="95">
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 토큰화 x , 정수 인코딩 o</span></span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> tokenize_and_align_labels(examples): <span class="co"># examples : dataset.map()을 통해 받을 배치 데이터</span></span>
+<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a>    tokenized_inputs <span class="op">=</span> tokenizer(examples[<span class="st">"tokens"</span>], truncation<span class="op">=</span><span class="va">True</span>, is_split_into_words<span class="op">=</span><span class="va">True</span>) <span class="co"># s_split_into_words=True면 토크나이저는 토큰화가 이미 진행됐다고 인식함.</span></span>
+<span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a>    <span class="co"># example['tokens'] -&gt; [['Hello','world],['My','name','is','John']]</span></span>
+<span id="cb48-5"><a href="#cb48-5" aria-hidden="true" tabindex="-1"></a>    <span class="co"># example['ner_tags'] -&gt; [[0,0],[0,1,0,2]] (각 단어의 라벨)</span></span>
+<span id="cb48-6"><a href="#cb48-6" aria-hidden="true" tabindex="-1"></a>    labels <span class="op">=</span> []</span>
+<span id="cb48-7"><a href="#cb48-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i, label <span class="kw">in</span> <span class="bu">enumerate</span>(examples[<span class="ss">f"ner_tags"</span>]): </span>
+<span id="cb48-8"><a href="#cb48-8" aria-hidden="true" tabindex="-1"></a>        word_ids <span class="op">=</span> tokenized_inputs.word_ids(batch_index<span class="op">=</span>i)  <span class="co"># 토큰을 해당 단어에 매핑, 추가적으로 word_ids 메서드는 word index의 줄임말이다.</span></span>
+<span id="cb48-9"><a href="#cb48-9" aria-hidden="true" tabindex="-1"></a>        previous_word_idx <span class="op">=</span> <span class="va">None</span> <span class="co"># 이전 단어 인덱스를 저장하여 첫 번째 토큰인지 확인</span></span>
+<span id="cb48-10"><a href="#cb48-10" aria-hidden="true" tabindex="-1"></a>        label_ids <span class="op">=</span> []</span>
+<span id="cb48-11"><a href="#cb48-11" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> word_idx <span class="kw">in</span> word_ids:  <span class="co"># 스페셜 토큰을 -100으로 세팅</span></span>
+<span id="cb48-12"><a href="#cb48-12" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> word_idx <span class="kw">is</span> <span class="va">None</span>: <span class="co"># 토큰이 None이라는 것은 현재 토큰이 특별한 토큰인 것을 나타내는 것이다. [CLS],[SEP],[PAD]일 때 None으로 출력되기 때문이다.</span></span>
+<span id="cb48-13"><a href="#cb48-13" aria-hidden="true" tabindex="-1"></a>                label_ids.append(<span class="dv">12</span>) <span class="co"># 12는 의미없는 토큰이라는 의미, -100은 손실계산을 하지 않기 위함 즉 12, -100 모두 자주 사용되는 값이다.</span></span>
+<span id="cb48-14"><a href="#cb48-14" aria-hidden="true" tabindex="-1"></a>                <span class="co"># label_ids.append(-100)</span></span>
+<span id="cb48-15"><a href="#cb48-15" aria-hidden="true" tabindex="-1"></a>                <span class="co"># 그런데! None이라는 건 특별한 거라면서? 왜 12나 -100을 추가해서 손실계산에서 빼?</span></span>
+<span id="cb48-16"><a href="#cb48-16" aria-hidden="true" tabindex="-1"></a>                <span class="co"># -&gt; None은 단어에 속하지 않는 스페셜 토큰을 나타낸다. 실제 단어가 아니기에(실제 문장의 의미를 담지 않기에) 토큰화 후 해당 토큰들이 학습에서 계산에 포함되는 것은 부적절하다.</span></span>
+<span id="cb48-17"><a href="#cb48-17" aria-hidden="true" tabindex="-1"></a>            <span class="cf">elif</span> word_idx <span class="op">!=</span> previous_word_idx:  <span class="co"># 주어진 단어의 첫 번째 토큰에만 레이블을 지정</span></span>
+<span id="cb48-18"><a href="#cb48-18" aria-hidden="true" tabindex="-1"></a>                label_ids.append(label[word_idx])</span>
+<span id="cb48-19"><a href="#cb48-19" aria-hidden="true" tabindex="-1"></a>            <span class="cf">else</span>: <span class="co"># playing에서 play , ##ing으로 나뉜다면 첫 번째 토큰인 play는 elif 구문에서 레이블을 넣고 ##ing은 -100으로 처리한다.</span></span>
+<span id="cb48-20"><a href="#cb48-20" aria-hidden="true" tabindex="-1"></a>                label_ids.append(<span class="op">-</span><span class="dv">100</span>)</span>
+<span id="cb48-21"><a href="#cb48-21" aria-hidden="true" tabindex="-1"></a>            previous_word_idx <span class="op">=</span> word_idx</span>
+<span id="cb48-22"><a href="#cb48-22" aria-hidden="true" tabindex="-1"></a>        labels.append(label_ids)</span>
+<span id="cb48-23"><a href="#cb48-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-24"><a href="#cb48-24" aria-hidden="true" tabindex="-1"></a>        <span class="co"># if-elif-else 구조가 필요한 이유</span></span>
+<span id="cb48-25"><a href="#cb48-25" aria-hidden="true" tabindex="-1"></a>        <span class="co"># word_idx is None (스페셜 토큰 처리)</span></span>
+<span id="cb48-26"><a href="#cb48-26" aria-hidden="true" tabindex="-1"></a>        <span class="co"># [CLS], [SEP], [PAD] 같은 특별한 토큰을 손실 계산에서 제외</span></span>
+<span id="cb48-27"><a href="#cb48-27" aria-hidden="true" tabindex="-1"></a>        <span class="co"># word_idx != previous_word_idx (단어의 첫 번째 토큰)</span></span>
+<span id="cb48-28"><a href="#cb48-28" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 단어의 첫 번째 토큰에만 레이블을 할당</span></span>
+<span id="cb48-29"><a href="#cb48-29" aria-hidden="true" tabindex="-1"></a>        <span class="co"># else (단어의 나머지 토큰들)</span></span>
+<span id="cb48-30"><a href="#cb48-30" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 단어의 나머지 토큰들은 손실 계산에서 제외 (-100 사용)</span></span>
+<span id="cb48-31"><a href="#cb48-31" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb48-32"><a href="#cb48-32" aria-hidden="true" tabindex="-1"></a>    tokenized_inputs[<span class="st">"labels"</span>] <span class="op">=</span> labels</span>
+<span id="cb48-33"><a href="#cb48-33" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> tokenized_inputs</span>
+<span id="cb48-34"><a href="#cb48-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-35"><a href="#cb48-35" aria-hidden="true" tabindex="-1"></a>tokenized_dataset <span class="op">=</span> dataset.<span class="bu">map</span>(tokenize_and_align_labels, batched<span class="op">=</span><span class="va">True</span>, remove_columns<span class="op">=</span>dataset[<span class="st">"train"</span>].column_names)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id":"5e772489993e461b9535cb67b55dd035","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
+</script>
+</div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id":"2f8e05782e19406098347b49143e5cdd","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
+</script>
+</div>
+</div>
+<div id="1188ca5d-6f42-440f-ae27-7c8289d08662" class="cell" data-execution_count="96">
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> transformers <span class="im">import</span> DataCollatorForTokenClassification</span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a>data_collator <span class="op">=</span> DataCollatorForTokenClassification(tokenizer<span class="op">=</span>tokenizer)</span>
+<span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a>batch <span class="op">=</span> data_collator([tokenized_dataset[<span class="st">"train"</span>][i] <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">10</span>)])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="8428d643-4578-41c8-8af9-6573b39da066" class="cell" data-execution_count="106">
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a>id2label <span class="op">=</span> {</span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a>    <span class="dv">0</span>: <span class="st">"B-DT"</span>,</span>
+<span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a>    <span class="dv">1</span>: <span class="st">"I-DT"</span>,</span>
+<span id="cb50-4"><a href="#cb50-4" aria-hidden="true" tabindex="-1"></a>    <span class="dv">2</span>: <span class="st">"B-LC"</span>,</span>
+<span id="cb50-5"><a href="#cb50-5" aria-hidden="true" tabindex="-1"></a>    <span class="dv">3</span>: <span class="st">"I-LC"</span>,</span>
+<span id="cb50-6"><a href="#cb50-6" aria-hidden="true" tabindex="-1"></a>    <span class="dv">4</span>: <span class="st">"B-OG"</span>,</span>
+<span id="cb50-7"><a href="#cb50-7" aria-hidden="true" tabindex="-1"></a>    <span class="dv">5</span>: <span class="st">"I-OG"</span>,</span>
+<span id="cb50-8"><a href="#cb50-8" aria-hidden="true" tabindex="-1"></a>    <span class="dv">6</span>: <span class="st">"B-PS"</span>,</span>
+<span id="cb50-9"><a href="#cb50-9" aria-hidden="true" tabindex="-1"></a>    <span class="dv">7</span>: <span class="st">"I-PS"</span>,</span>
+<span id="cb50-10"><a href="#cb50-10" aria-hidden="true" tabindex="-1"></a>    <span class="dv">8</span>: <span class="st">"B-QT"</span>,</span>
+<span id="cb50-11"><a href="#cb50-11" aria-hidden="true" tabindex="-1"></a>    <span class="dv">9</span>: <span class="st">"I-QT"</span>,</span>
+<span id="cb50-12"><a href="#cb50-12" aria-hidden="true" tabindex="-1"></a>    <span class="dv">10</span>: <span class="st">"B-TI"</span>,</span>
+<span id="cb50-13"><a href="#cb50-13" aria-hidden="true" tabindex="-1"></a>    <span class="dv">11</span>: <span class="st">"I-TI"</span>,</span>
+<span id="cb50-14"><a href="#cb50-14" aria-hidden="true" tabindex="-1"></a>    <span class="dv">12</span>: <span class="st">"O"</span>,</span>
+<span id="cb50-15"><a href="#cb50-15" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb50-16"><a href="#cb50-16" aria-hidden="true" tabindex="-1"></a>label2id <span class="op">=</span> {v:k <span class="cf">for</span> k,v <span class="kw">in</span> id2label.items()} <span class="co"># k,v 뒤집기</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="2ddf97ec-6110-420f-b9d5-f4d76c2bf302" class="cell" data-execution_count="109">
+<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> transformers <span class="im">import</span> AutoModelForTokenClassification</span>
+<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> AutoModelForTokenClassification.from_pretrained(</span>
+<span id="cb51-4"><a href="#cb51-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">'klue/bert-base'</span>,</span>
+<span id="cb51-5"><a href="#cb51-5" aria-hidden="true" tabindex="-1"></a>    num_labels <span class="op">=</span> <span class="dv">13</span>,</span>
+<span id="cb51-6"><a href="#cb51-6" aria-hidden="true" tabindex="-1"></a>    id2label <span class="op">=</span> id2label,</span>
+<span id="cb51-7"><a href="#cb51-7" aria-hidden="true" tabindex="-1"></a>    label2id <span class="op">=</span> label2id</span>
+<span id="cb51-8"><a href="#cb51-8" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Some weights of the model checkpoint at klue/bert-base were not used when initializing BertForTokenClassification: ['cls.predictions.decoder.bias', 'cls.predictions.transform.dense.bias', 'cls.predictions.transform.dense.weight', 'cls.seq_relationship.bias', 'cls.predictions.transform.LayerNorm.weight', 'cls.seq_relationship.weight', 'cls.predictions.transform.LayerNorm.bias', 'cls.predictions.decoder.weight', 'cls.predictions.bias']
+- This IS expected if you are initializing BertForTokenClassification from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
+- This IS NOT expected if you are initializing BertForTokenClassification from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+Some weights of BertForTokenClassification were not initialized from the model checkpoint at klue/bert-base and are newly initialized: ['classifier.weight', 'classifier.bias']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.</code></pre>
+</div>
+</div>
+<div id="631259df-5109-49db-80bc-a915ef1bc400" class="cell" data-scrolled="true" data-execution_count="110">
+<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> torch.no_grad():</span>
+<span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a>  logits <span class="op">=</span> model(<span class="op">**</span>batch).logits</span>
+<span id="cb53-3"><a href="#cb53-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb53-4"><a href="#cb53-4" aria-hidden="true" tabindex="-1"></a>predictions <span class="op">=</span> torch.argmax(logits, dim<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb53-5"><a href="#cb53-5" aria-hidden="true" tabindex="-1"></a>predicted_token_class <span class="op">=</span> [model.config.id2label[t.item()] <span class="cf">for</span> t <span class="kw">in</span> predictions[<span class="dv">0</span>]]</span>
+<span id="cb53-6"><a href="#cb53-6" aria-hidden="true" tabindex="-1"></a>predicted_token_class</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="110">
+<pre><code>['I-OG',
+ 'O',
+ 'O',
+ 'O',
+ 'O',
+ 'B-PS',
+ 'O',
+ 'B-TI',
+ 'B-TI',
+ 'O',
+ 'B-OG',
+ 'B-OG',
+ 'I-DT',
+ 'B-OG',
+ 'B-TI',
+ 'O',
+ 'I-DT',
+ 'O',
+ 'I-OG',
+ 'O',
+ 'B-OG',
+ 'I-QT',
+ 'I-OG',
+ 'B-OG',
+ 'I-QT',
+ 'O',
+ 'B-TI',
+ 'I-QT',
+ 'O',
+ 'I-DT',
+ 'O',
+ 'B-TI',
+ 'B-TI',
+ 'B-OG',
+ 'B-TI',
+ 'B-TI',
+ 'I-QT',
+ 'I-DT',
+ 'B-OG',
+ 'I-DT',
+ 'B-OG',
+ 'B-QT',
+ 'B-DT',
+ 'B-TI',
+ 'B-TI',
+ 'O',
+ 'B-OG',
+ 'I-OG',
+ 'O',
+ 'B-DT',
+ 'I-TI',
+ 'O',
+ 'B-TI',
+ 'O',
+ 'O',
+ 'B-PS',
+ 'B-OG',
+ 'O',
+ 'O',
+ 'O',
+ 'B-OG',
+ 'B-OG',
+ 'B-OG',
+ 'B-OG',
+ 'B-OG',
+ 'B-OG',
+ 'B-OG',
+ 'B-OG',
+ 'B-OG',
+ 'B-OG',
+ 'O',
+ 'B-OG',
+ 'B-OG',
+ 'O',
+ 'O',
+ 'B-OG',
+ 'B-OG',
+ 'O',
+ 'I-QT',
+ 'B-OG',
+ 'B-OG',
+ 'B-OG',
+ 'B-OG',
+ 'B-OG',
+ 'B-OG',
+ 'B-OG',
+ 'O',
+ 'B-OG',
+ 'B-OG',
+ 'B-OG',
+ 'O',
+ 'B-OG',
+ 'O',
+ 'B-OG',
+ 'B-OG',
+ 'B-OG',
+ 'B-OG',
+ 'B-OG',
+ 'B-OG',
+ 'B-OG',
+ 'B-OG',
+ 'B-OG',
+ 'B-OG',
+ 'O',
+ 'O',
+ 'O',
+ 'O',
+ 'O',
+ 'B-OG',
+ 'B-OG',
+ 'B-OG',
+ 'B-OG',
+ 'O',
+ 'O',
+ 'B-OG',
+ 'B-OG',
+ 'B-OG']</code></pre>
+</div>
+</div>
+</section>
+<section id="evaluate-1" class="level2">
+<h2 class="anchored" data-anchor-id="evaluate-1">4-3. evaluate</h2>
+<div id="3c04ac0d-53b7-472c-b5d6-b7275db61d20" class="cell" data-execution_count="179">
+<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> evaluate</span>
+<span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb55-3"><a href="#cb55-3" aria-hidden="true" tabindex="-1"></a>pred_labels <span class="op">=</span> logits.argmax(dim<span class="op">=</span><span class="dv">2</span>).flatten().cpu().numpy() <span class="co"># logits.argmax(dim=2)의 결과를 1차원 벡터로 변환</span></span>
+<span id="cb55-4"><a href="#cb55-4" aria-hidden="true" tabindex="-1"></a>true_labels <span class="op">=</span> batch[<span class="st">"labels"</span>].flatten().numpy() <span class="co"># batch의 레이블을 1차원 벡터로 변환</span></span>
+<span id="cb55-5"><a href="#cb55-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb55-6"><a href="#cb55-6" aria-hidden="true" tabindex="-1"></a><span class="co"># evaluate 할 때는 데이터들을 1차원 텐서로 바꿔야한다.</span></span>
+<span id="cb55-7"><a href="#cb55-7" aria-hidden="true" tabindex="-1"></a>f1 <span class="op">=</span> evaluate.load(<span class="st">"f1"</span>)</span>
+<span id="cb55-8"><a href="#cb55-8" aria-hidden="true" tabindex="-1"></a>f1.compute(predictions<span class="op">=</span>pred_labels, references<span class="op">=</span>true_labels, average<span class="op">=</span><span class="st">"micro"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="179">
+<pre><code>{'f1': 0.06923076923076923}</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="question-answering" class="level1">
+<h1>5. Question Answering</h1>
+<p>추출: 주어진 context에서 답변을 추출한다. - 추출 질의 응답은 질문에 대한 답변을 입력된 context에서 말 그대로 추출하는 방식이다.</p>
+<p>생성: 질문에 정확하게 답하는 맥락에서 답을 생성한다. - 문제에 대한 답을 입력 context를 참고하여 새로 작성하는 방식이다.</p>
+<section id="model-1" class="level2">
+<h2 class="anchored" data-anchor-id="model-1">5-1. model</h2>
+<div id="acb12e59-3e18-4433-885d-27f781b6da2a" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb57"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch</span>
+<span id="cb57-2"><a href="#cb57-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> transformers <span class="im">import</span> AutoTokenizer, AutoModelForQuestionAnswering</span>
+<span id="cb57-3"><a href="#cb57-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb57-4"><a href="#cb57-4" aria-hidden="true" tabindex="-1"></a>model_name <span class="op">=</span> <span class="st">"klue/bert-base"</span></span>
+<span id="cb57-5"><a href="#cb57-5" aria-hidden="true" tabindex="-1"></a>tokenizer <span class="op">=</span> AutoTokenizer.from_pretrained(model_name)</span>
+<span id="cb57-6"><a href="#cb57-6" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> AutoModelForQuestionAnswering.from_pretrained(model_name)</span>
+<span id="cb57-7"><a href="#cb57-7" aria-hidden="true" tabindex="-1"></a>model</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>2025-03-28 02:48:07.896997: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:467] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+E0000 00:00:1743130087.914973   41991 cuda_dnn.cc:8579] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered
+E0000 00:00:1743130087.920553   41991 cuda_blas.cc:1407] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
+W0000 00:00:1743130087.934591   41991 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.
+W0000 00:00:1743130087.934608   41991 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.
+W0000 00:00:1743130087.934609   41991 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.
+W0000 00:00:1743130087.934611   41991 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.
+2025-03-28 02:48:07.939078: I tensorflow/core/platform/cpu_feature_guard.cc:210] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: AVX2 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+Some weights of the model checkpoint at klue/bert-base were not used when initializing BertForQuestionAnswering: ['cls.predictions.transform.LayerNorm.weight', 'cls.predictions.transform.dense.weight', 'cls.seq_relationship.weight', 'cls.predictions.transform.LayerNorm.bias', 'cls.seq_relationship.bias', 'cls.predictions.decoder.bias', 'cls.predictions.transform.dense.bias', 'cls.predictions.bias', 'cls.predictions.decoder.weight']
+- This IS expected if you are initializing BertForQuestionAnswering from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
+- This IS NOT expected if you are initializing BertForQuestionAnswering from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+Some weights of BertForQuestionAnswering were not initialized from the model checkpoint at klue/bert-base and are newly initialized: ['qa_outputs.weight', 'qa_outputs.bias']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="3">
+<pre><code>BertForQuestionAnswering(
+  (bert): BertModel(
+    (embeddings): BertEmbeddings(
+      (word_embeddings): Embedding(32000, 768, padding_idx=0)
+      (position_embeddings): Embedding(512, 768)
+      (token_type_embeddings): Embedding(2, 768)
+      (LayerNorm): LayerNorm((768,), eps=1e-12, elementwise_affine=True)
+      (dropout): Dropout(p=0.1, inplace=False)
+    )
+    (encoder): BertEncoder(
+      (layer): ModuleList(
+        (0-11): 12 x BertLayer(
+          (attention): BertAttention(
+            (self): BertSelfAttention(
+              (query): Linear(in_features=768, out_features=768, bias=True)
+              (key): Linear(in_features=768, out_features=768, bias=True)
+              (value): Linear(in_features=768, out_features=768, bias=True)
+              (dropout): Dropout(p=0.1, inplace=False)
+            )
+            (output): BertSelfOutput(
+              (dense): Linear(in_features=768, out_features=768, bias=True)
+              (LayerNorm): LayerNorm((768,), eps=1e-12, elementwise_affine=True)
+              (dropout): Dropout(p=0.1, inplace=False)
+            )
+          )
+          (intermediate): BertIntermediate(
+            (dense): Linear(in_features=768, out_features=3072, bias=True)
+          )
+          (output): BertOutput(
+            (dense): Linear(in_features=3072, out_features=768, bias=True)
+            (LayerNorm): LayerNorm((768,), eps=1e-12, elementwise_affine=True)
+            (dropout): Dropout(p=0.1, inplace=False)
+          )
+        )
+      )
+    )
+  )
+  (qa_outputs): Linear(in_features=768, out_features=2, bias=True)
+)</code></pre>
+</div>
+</div>
+</section>
+<section id="dataset-3" class="level2">
+<h2 class="anchored" data-anchor-id="dataset-3">5-2. Dataset</h2>
+<div id="c1fa83e8-7b92-4572-9526-e2ec8e624501" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> datasets <span class="im">import</span> load_dataset</span>
+<span id="cb60-2"><a href="#cb60-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb60-3"><a href="#cb60-3" aria-hidden="true" tabindex="-1"></a>dataset <span class="op">=</span> load_dataset(<span class="st">"klue"</span>, <span class="st">"mrc"</span>)</span>
+<span id="cb60-4"><a href="#cb60-4" aria-hidden="true" tabindex="-1"></a>sample <span class="op">=</span> dataset[<span class="st">"train"</span>][<span class="dv">0</span>]</span>
+<span id="cb60-5"><a href="#cb60-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb60-6"><a href="#cb60-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"내용 : </span><span class="sc">{</span>sample[<span class="st">'context'</span>][:<span class="dv">50</span>]<span class="sc">}</span><span class="ss">"</span>) <span class="co"># context: 모델이 답변을 추출할 때, 필요한 배경 정보</span></span>
+<span id="cb60-7"><a href="#cb60-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"질문 : </span><span class="sc">{</span>sample[<span class="st">'question'</span>]<span class="sc">}</span><span class="ss">"</span>) <span class="co"># question: 모델이 대답해야 하는 질문</span></span>
+<span id="cb60-8"><a href="#cb60-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"답변 : </span><span class="sc">{</span>sample[<span class="st">'answers'</span>]<span class="sc">}</span><span class="ss">"</span>) <span class="co"># answers: 답변 토큰과 답변 텍스트 시작 위치</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id":"98fdbbe0d6d94c22b10b4649a8d8a68b","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
+</script>
+</div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id":"4d4c41534d4340de9b6793210e3f5d9c","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
+</script>
+</div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id":"88d7769613bc4954aa3b632a9839d68f","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
+</script>
+</div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id":"61214d96a167487cb38fc424efbf5079","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
+</script>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>내용 : 올여름 장마가 17일 제주도에서 시작됐다. 서울 등 중부지방은 예년보다 사나흘 정도 늦은 
+질문 : 북태평양 기단과 오호츠크해 기단이 만나 국내에 머무르는 기간은?
+답변 : {'answer_start': [478, 478], 'text': ['한 달가량', '한 달']}</code></pre>
+</div>
+</div>
+</section>
+<section id="data-preprocssing" class="level2">
+<h2 class="anchored" data-anchor-id="data-preprocssing">5-3. Data preprocssing</h2>
+<div id="ff24bd60-ce35-4673-a569-e691d9255e95" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb62"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> preprocess_function(examples):</span>
+<span id="cb62-2"><a href="#cb62-2" aria-hidden="true" tabindex="-1"></a>    questions <span class="op">=</span> [q.strip() <span class="cf">for</span> q <span class="kw">in</span> examples[<span class="st">"question"</span>]]</span>
+<span id="cb62-3"><a href="#cb62-3" aria-hidden="true" tabindex="-1"></a>    inputs <span class="op">=</span> tokenizer(</span>
+<span id="cb62-4"><a href="#cb62-4" aria-hidden="true" tabindex="-1"></a>        questions,</span>
+<span id="cb62-5"><a href="#cb62-5" aria-hidden="true" tabindex="-1"></a>        examples[<span class="st">"context"</span>],</span>
+<span id="cb62-6"><a href="#cb62-6" aria-hidden="true" tabindex="-1"></a>        max_length<span class="op">=</span><span class="dv">384</span>,</span>
+<span id="cb62-7"><a href="#cb62-7" aria-hidden="true" tabindex="-1"></a>        truncation<span class="op">=</span><span class="st">"only_second"</span>, </span>
+<span id="cb62-8"><a href="#cb62-8" aria-hidden="true" tabindex="-1"></a>        return_offsets_mapping<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb62-9"><a href="#cb62-9" aria-hidden="true" tabindex="-1"></a>        padding<span class="op">=</span><span class="st">"max_length"</span>,</span>
+<span id="cb62-10"><a href="#cb62-10" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb62-11"><a href="#cb62-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb62-12"><a href="#cb62-12" aria-hidden="true" tabindex="-1"></a>    offset_mapping <span class="op">=</span> inputs.pop(<span class="st">"offset_mapping"</span>)</span>
+<span id="cb62-13"><a href="#cb62-13" aria-hidden="true" tabindex="-1"></a>    answers <span class="op">=</span> examples[<span class="st">"answers"</span>]</span>
+<span id="cb62-14"><a href="#cb62-14" aria-hidden="true" tabindex="-1"></a>    start_positions <span class="op">=</span> []</span>
+<span id="cb62-15"><a href="#cb62-15" aria-hidden="true" tabindex="-1"></a>    end_positions <span class="op">=</span> []</span>
+<span id="cb62-16"><a href="#cb62-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb62-17"><a href="#cb62-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i, offset <span class="kw">in</span> <span class="bu">enumerate</span>(offset_mapping):</span>
+<span id="cb62-18"><a href="#cb62-18" aria-hidden="true" tabindex="-1"></a>        answer <span class="op">=</span> answers[i]</span>
+<span id="cb62-19"><a href="#cb62-19" aria-hidden="true" tabindex="-1"></a>        start_char <span class="op">=</span> answer[<span class="st">"answer_start"</span>][<span class="dv">0</span>]</span>
+<span id="cb62-20"><a href="#cb62-20" aria-hidden="true" tabindex="-1"></a>        end_char <span class="op">=</span> answer[<span class="st">"answer_start"</span>][<span class="dv">0</span>] <span class="op">+</span> <span class="bu">len</span>(answer[<span class="st">"text"</span>][<span class="dv">0</span>])</span>
+<span id="cb62-21"><a href="#cb62-21" aria-hidden="true" tabindex="-1"></a>        sequence_ids <span class="op">=</span> inputs.sequence_ids(i)</span>
+<span id="cb62-22"><a href="#cb62-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb62-23"><a href="#cb62-23" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Find the start and end of the context</span></span>
+<span id="cb62-24"><a href="#cb62-24" aria-hidden="true" tabindex="-1"></a>        idx <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb62-25"><a href="#cb62-25" aria-hidden="true" tabindex="-1"></a>        <span class="cf">while</span> sequence_ids[idx] <span class="op">!=</span> <span class="dv">1</span>:</span>
+<span id="cb62-26"><a href="#cb62-26" aria-hidden="true" tabindex="-1"></a>            idx <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb62-27"><a href="#cb62-27" aria-hidden="true" tabindex="-1"></a>        context_start <span class="op">=</span> idx</span>
+<span id="cb62-28"><a href="#cb62-28" aria-hidden="true" tabindex="-1"></a>        <span class="cf">while</span> sequence_ids[idx] <span class="op">==</span> <span class="dv">1</span>:</span>
+<span id="cb62-29"><a href="#cb62-29" aria-hidden="true" tabindex="-1"></a>            idx <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb62-30"><a href="#cb62-30" aria-hidden="true" tabindex="-1"></a>        context_end <span class="op">=</span> idx <span class="op">-</span> <span class="dv">1</span></span>
+<span id="cb62-31"><a href="#cb62-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb62-32"><a href="#cb62-32" aria-hidden="true" tabindex="-1"></a>        <span class="co"># If the answer is not fully inside the context, label it (0, 0)</span></span>
+<span id="cb62-33"><a href="#cb62-33" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> offset[context_start][<span class="dv">0</span>] <span class="op">&gt;</span> end_char <span class="kw">or</span> offset[context_end][<span class="dv">1</span>] <span class="op">&lt;</span> start_char:</span>
+<span id="cb62-34"><a href="#cb62-34" aria-hidden="true" tabindex="-1"></a>            start_positions.append(<span class="dv">0</span>)</span>
+<span id="cb62-35"><a href="#cb62-35" aria-hidden="true" tabindex="-1"></a>            end_positions.append(<span class="dv">0</span>)</span>
+<span id="cb62-36"><a href="#cb62-36" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb62-37"><a href="#cb62-37" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Otherwise it's the start and end token positions</span></span>
+<span id="cb62-38"><a href="#cb62-38" aria-hidden="true" tabindex="-1"></a>            idx <span class="op">=</span> context_start</span>
+<span id="cb62-39"><a href="#cb62-39" aria-hidden="true" tabindex="-1"></a>            <span class="cf">while</span> idx <span class="op">&lt;=</span> context_end <span class="kw">and</span> offset[idx][<span class="dv">0</span>] <span class="op">&lt;=</span> start_char:</span>
+<span id="cb62-40"><a href="#cb62-40" aria-hidden="true" tabindex="-1"></a>                idx <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb62-41"><a href="#cb62-41" aria-hidden="true" tabindex="-1"></a>            start_positions.append(idx <span class="op">-</span> <span class="dv">1</span>)</span>
+<span id="cb62-42"><a href="#cb62-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb62-43"><a href="#cb62-43" aria-hidden="true" tabindex="-1"></a>            idx <span class="op">=</span> context_end</span>
+<span id="cb62-44"><a href="#cb62-44" aria-hidden="true" tabindex="-1"></a>            <span class="cf">while</span> idx <span class="op">&gt;=</span> context_start <span class="kw">and</span> offset[idx][<span class="dv">1</span>] <span class="op">&gt;=</span> end_char:</span>
+<span id="cb62-45"><a href="#cb62-45" aria-hidden="true" tabindex="-1"></a>                idx <span class="op">-=</span> <span class="dv">1</span></span>
+<span id="cb62-46"><a href="#cb62-46" aria-hidden="true" tabindex="-1"></a>            end_positions.append(idx <span class="op">+</span> <span class="dv">1</span>)</span>
+<span id="cb62-47"><a href="#cb62-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb62-48"><a href="#cb62-48" aria-hidden="true" tabindex="-1"></a>    inputs[<span class="st">"start_positions"</span>] <span class="op">=</span> start_positions</span>
+<span id="cb62-49"><a href="#cb62-49" aria-hidden="true" tabindex="-1"></a>    inputs[<span class="st">"end_positions"</span>] <span class="op">=</span> end_positions</span>
+<span id="cb62-50"><a href="#cb62-50" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> inputs</span>
+<span id="cb62-51"><a href="#cb62-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb62-52"><a href="#cb62-52" aria-hidden="true" tabindex="-1"></a>tokenized_dataset <span class="op">=</span> dataset.<span class="bu">map</span>(preprocess_function, batched<span class="op">=</span><span class="va">True</span>, remove_columns<span class="op">=</span>dataset[<span class="st">"train"</span>].column_names)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id":"a76d6503b6f942b092484f52417c7a09","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
+</script>
+</div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id":"ae1d579077a24424916ce526497954ca","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
+</script>
+</div>
+</div>
+</section>
+<section id="보충-설명" class="level2">
+<h2 class="anchored" data-anchor-id="보충-설명">보충 설명</h2>
+<p><code>truncation="only_second"</code></p>
+<ul>
+<li>truncation을 only_second로 설정하면 두 번째 문장에 대해서만 max_length보다 긴 부분을 잘라낸다.</li>
+<li>QA task에서는 보통 question과 context를 함께 모델에 입력함. 보통 context가 길기고 question은 짧기에 context가 max_length를 넘으면 자른다.</li>
+</ul>
+<p><code>return_offsets_mapping=True</code></p>
+<ul>
+<li>인코됭된 토큰이 원본 문장에서 몇 번째 글자인지를 알 수 있도록 인덱스를 반환하도록 설정하는 옵션이다.</li>
+<li>QA task에서 answert이 context에서 추출되는 방식이다. 즉 answer 시작과 끝이 context 내에서 특정한 위치에 존재한다. 하지만 토큰화 과정에서 단어가 쪼개지기에 원본 문장에서 정확한 위치를 찾기 힘들다.</li>
+<li>그래서 return_offsets_mapping=True를 설정하면 각 토큰이 원본 문장의 몇 번째 글자 범위에 해당하는지 매핑해줘서 모델이 정답을 원본 문장에서 찾을 수 있도록 도와준다.</li>
+</ul>
+</section>
+<section id="collator-1" class="level2">
+<h2 class="anchored" data-anchor-id="collator-1">5-4. Collator</h2>
+<p>input_ids, token_type_ids, attention_mask 칼럼을 입력 문장으로 만들고 각각 답변 시작과 끝 인덱스를 가리키는 start_positions과 end_positions이 출력(정답)이 된다.</p>
+<div id="7dd24310-6306-4d30-8cab-1b95ec8647d1" class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb63"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> transformers <span class="im">import</span> DataCollatorWithPadding</span>
+<span id="cb63-2"><a href="#cb63-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb63-3"><a href="#cb63-3" aria-hidden="true" tabindex="-1"></a>data_collator <span class="op">=</span> DataCollatorWithPadding(tokenizer)</span>
+<span id="cb63-4"><a href="#cb63-4" aria-hidden="true" tabindex="-1"></a>batch <span class="op">=</span> data_collator([tokenized_dataset[<span class="st">"train"</span>][i] <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">10</span>)])</span>
+<span id="cb63-5"><a href="#cb63-5" aria-hidden="true" tabindex="-1"></a>batch</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="8">
+<pre><code>{'input_ids': tensor([[    2,  1174, 18956,  ...,  2170,  2259,     3],
+        [    2,  3920, 31221,  ...,  8055,  2867,     3],
+        [    2,  8813,  2444,  ...,  3691,  4538,     3],
+        ...,
+        [    2,  6860, 19364,  ...,  2532,  6370,     3],
+        [    2, 27463, 23413,  ..., 21786,  2069,     3],
+        [    2,  3659,  2170,  ...,  2470,  3703,     3]]), 'token_type_ids': tensor([[0, 0, 0,  ..., 1, 1, 1],
+        [0, 0, 0,  ..., 1, 1, 1],
+        [0, 0, 0,  ..., 1, 1, 1],
+        ...,
+        [0, 0, 0,  ..., 1, 1, 1],
+        [0, 0, 0,  ..., 1, 1, 1],
+        [0, 0, 0,  ..., 1, 1, 1]]), 'attention_mask': tensor([[1, 1, 1,  ..., 1, 1, 1],
+        [1, 1, 1,  ..., 1, 1, 1],
+        [1, 1, 1,  ..., 1, 1, 1],
+        ...,
+        [1, 1, 1,  ..., 1, 1, 1],
+        [1, 1, 1,  ..., 1, 1, 1],
+        [1, 1, 1,  ..., 1, 1, 1]]), 'start_positions': tensor([260,  31,   0,  80,  72,  81, 216, 348, 323, 348]), 'end_positions': tensor([263,  33,   0,  81,  78,  87, 221, 352, 328, 353])}</code></pre>
+</div>
+</div>
+</section>
+<section id="prediction-1" class="level2">
+<h2 class="anchored" data-anchor-id="prediction-1">5-5. prediction</h2>
+<div id="a503c701-64f4-452d-9e37-c4e7ccbd7149" class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb65"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> torch.no_grad():</span>
+<span id="cb65-2"><a href="#cb65-2" aria-hidden="true" tabindex="-1"></a>    outputs <span class="op">=</span> model(<span class="op">**</span>batch)</span>
+<span id="cb65-3"><a href="#cb65-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb65-4"><a href="#cb65-4" aria-hidden="true" tabindex="-1"></a>answer_start_index <span class="op">=</span> outputs.start_logits.argmax()</span>
+<span id="cb65-5"><a href="#cb65-5" aria-hidden="true" tabindex="-1"></a>answer_end_index <span class="op">=</span> outputs.end_logits.argmax()</span>
+<span id="cb65-6"><a href="#cb65-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb65-7"><a href="#cb65-7" aria-hidden="true" tabindex="-1"></a>predict_answer_tokens <span class="op">=</span> batch[<span class="st">"input_ids"</span>][<span class="dv">0</span>, answer_start_index : answer_end_index <span class="op">+</span> <span class="dv">1</span>]</span>
+<span id="cb65-8"><a href="#cb65-8" aria-hidden="true" tabindex="-1"></a>tokenizer.decode(predict_answer_tokens)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="9">
+<pre><code>'. 서울 등 중부지방은 예년보다 사나흘 정도 늦은 이달 말께 장마가 시작될 전망이다. 17일 기상청에 따르면 제주도 남쪽 먼바다에 있는 장마전선의 영향으로 이날 제주도 산간 및 내륙지역에 호우주의보가 내려지면서 곳곳에 100㎜에 육박하는 많은 비가 내렸다. 제주의 장마는 평년보다 2 ~ 3일, 지난해보다는 하루 일찍 시작됐다. 장마는 고온다습한 북태평양 기단과 한랭 습윤한 오호츠크해 기단이 만나 형성되는 장마전선에서 내리는 비를 뜻한다. 장마전선은 18일 제주도 먼 남쪽 해상으로 내려갔다가 20일께 다시 북상해 전남 남해안까지 영향을 줄 것으로 보인다. 이에 따라 20 ~ 21일 남부지방에도 예년보다 사흘 정도 장마가 일찍 찾아올 전망이다. 그러나 장마전선을 밀어올리는 북태평양 고기압 세력이 약해 서울 등 중부지방은 평년보다 사나흘가량 늦은 이달 말부터 장마가 시작될 것이라는 게 기상청의 설명이다. 장마전선은 이후 한 달가량 한반도 중남부를 오르내리며 곳곳에 비를 뿌릴 전망이다. 최근 30년간 평균치에 따르면 중부지방의 장마 시작일은 6월24 ~ 25일이었으며 장마기간은 32일, 강수일수는 17. 2일이었다. 기상청은 올해 장마기간의 평균 강수량이 350 ~ 400㎜로 평년과 비슷하거나 적을 것으로 내다봤다. 브라질 월드컵 한국과 러시아의 경기가 열리는 18일 오전 서울은 대체로 구름'</code></pre>
+</div>
+</div>
+</section>
+<section id="evaluate-2" class="level2">
+<h2 class="anchored" data-anchor-id="evaluate-2">5-6. evaluate</h2>
+<div id="19cdd6d2-b6bc-4102-91fd-ed5497ac7799" class="cell">
+<div class="sourceCode cell-code" id="cb67"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb67-1"><a href="#cb67-1" aria-hidden="true" tabindex="-1"></a><span class="co"># evaluate.load('sqaud')</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>위의 코드로 진행이 가능하지만 상당한 양의 후처리가 필요하고 시간이 많이 걸리기에 생략한다.</p>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
