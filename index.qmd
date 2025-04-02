@@ -1,5 +1,5 @@
 ---
-title: "."
+title: "Natural language processing"
 listing:
   contents: posts
   sort: "date desc"
