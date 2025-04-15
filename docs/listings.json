@@ -2,6 +2,7 @@
   {
     "listing": "/index.html",
     "items": [
+      "/posts/model_fine_tuning.html",
       "/posts/BPE_tokenize.html",
       "/posts/Base_on_Enco_Deco.html",
       "/posts/Based_on_Encoder.html",
