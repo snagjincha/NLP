@@ -2,6 +2,7 @@
   {
     "listing": "/index.html",
     "items": [
+      "/posts/Transformer_architecture.html",
       "/posts/model_fine_tuning.html",
       "/posts/BPE_tokenize.html",
       "/posts/Base_on_Enco_Deco.html",
