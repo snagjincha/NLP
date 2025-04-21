@@ -2,7 +2,6 @@
   {
     "listing": "/index.html",
     "items": [
-      "/posts/CD_Project1.html",
       "/posts/Transformer_architecture.html",
       "/posts/model_fine_tuning.html",
       "/posts/BPE_tokenize.html",
