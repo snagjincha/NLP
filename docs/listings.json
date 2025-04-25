@@ -2,6 +2,7 @@
   {
     "listing": "/index.html",
     "items": [
+      "/posts/Bayes.html",
       "/posts/BPE.html",
       "/posts/Transformer_architecture.html",
       "/posts/model_fine_tuning.html",
