@@ -2,6 +2,7 @@
   {
     "listing": "/index.html",
     "items": [
+      "/posts/morphological.html",
       "/posts/Bayes.html",
       "/posts/BPE.html",
       "/posts/Transformer_architecture.html",
