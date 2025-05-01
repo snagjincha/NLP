@@ -515,7 +515,7 @@
     "href": "posts/morphological.html#longestshortest-match-analysis",
     "title": "Tabular Parsing",
     "section": "2-2. Longest/Shortest Match Analysis",
-    "text": "2-2. Longest/Shortest Match Analysis\nTabular Parsing의 Time complexity 문제를 해결하기 위해서 Longest/Shortest Match Analysis 방식을 이용한다.\n- 형태소 분석에서 문자열을 어떤 방식으로 나눌지 결정할 때 우선순위(Priority) 에 따라 처리 순서를 결정함.\n\nLongest Match (가장 긴 형태소 우선)\n\n가능한 가장 긴 단어부터 사전에 있는지 확인 - 예: 감기는 - → 감기/NOUN + 는/JOSA - 결과: 형태소 2개\nLongest match는 분석 속도가 빠르지만, 모호성을 유발할 수 있다.\n\nShortest Match (가장 짧은 형태소 우선)\n\n가능한 가장 짧은 단어부터 사전에 있는지 확인 - 예: 감기는 - → 감/NOUN + 기/EOMI + 는/JOSA - 결과: 형태소 3개\nShortest match는 더 많은 조합을 고려하지만 느릴 수 있다."
+    "text": "2-2. Longest/Shortest Match Analysis\nTabular Parsing의 Time complexity 문제를 해결하기 위해서 Longest/Shortest Match Analysis 방식을 이용한다.\n- 형태소 분석에서 문자열을 어떤 방식으로 나눌지 결정할 때 우선순위(Priority) 에 따라 처리 순서를 결정함.\n\nLongest Match (가장 긴 형태소 우선): 가능한 가장 긴 단어부터 사전에 있는지 확인\n\n\n예: 감기는\n\n→ 감기/NOUN + 는/JOSA\n\n결과: 형태소 2개\n\n\nShortest Match (가장 짧은 형태소 우선): 가능한 가장 짧은 단어부터 사전에 있는지 확인\n\n\n예: 감기는\n\n→ 감/NOUN + 기/EOMI + 는/JOSA\n\n결과: 형태소 3개\n\n\n유의점\n\nShortest match는 더 많은 조합을 고려하지만 느릴 수 있다.\nLongest match는 분석 속도가 빠르지만, 모호성을 유발할 수 있다."
   },
   {
     "objectID": "posts/About_Transformers.html",
