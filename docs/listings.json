@@ -2,6 +2,7 @@
   {
     "listing": "/index.html",
     "items": [
+      "/posts/tokenizer_pretraining.html",
       "/posts/Hangeul_Automata.html",
       "/posts/morphological.html",
       "/posts/Bayes.html",
