@@ -2,6 +2,7 @@
   {
     "listing": "/index.html",
     "items": [
+      "/posts/NER.html",
       "/posts/tokenizer_training.html",
       "/posts/Hangeul_Automata.html",
       "/posts/morphological.html",
