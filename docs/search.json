@@ -553,11 +553,11 @@
     "text": "2-3. Preprocessing\n\nmax_length = 512 # 문장의 최대길이\ndef group_texts(batched_sample):\n    sample = {k: v[0] for k, v in batched_sample.items()}\n\n    if sample[\"input_ids\"][-1] != tokenizer.eos_token_id: # sample['input_ids']의 마지막 토큰이 eos 토큰이 아닌 경우에만 실행된다.\n        for k in sample.keys():\n            sample[k].append(\n                tokenizer.eos_token_id if k == \"input_ids\" else sample[k][-1] # input_ids 키인 경우에는 eos_token_id를 추가한다.\n            )\n\n    result = {k: [v[i: i + max_length] for i in range(0, len(v), max_length)] for k, v in sample.items()}\n    return result\n\ngrouped_dataset = tokenized_dataset.map(\n    group_texts,\n    batched=True, # 입력 데이터가 배치 단위로 전달됨\n    batch_size=1, # 한 번에 1개의 데이터만 처리\n    num_proc=2,\n)\nprint(len(grouped_dataset[\"train\"][0][\"input_ids\"]))\nprint(grouped_dataset)\n\n512\nDatasetDict({\n    train: Dataset({\n        features: ['input_ids', 'attention_mask'],\n        num_rows: 18365\n    })\n    test: Dataset({\n        features: ['input_ids', 'attention_mask'],\n        num_rows: 2400\n    })\n})\n\n\n- 데이터에 정답 데이터인 labels 칼럼이 존재하지 않는다. (디코더 기반이니까)\n디코더 기반 모델 생성태스크에서는 labels 데이터를 따로 작성하지 않고 input_ids에 모두 포함한다.\n-&gt; 입력된 문장을 한 칸 이동시킨 값을 정답으로 사용함. (기술적 이유로 labels 칼럼은 추가해야하기에 콜레이터를 사용해 정답 label이 없는 것을 해결한다.)"
   },
   {
-    "objectID": "posts/Based_on_Decoder.html#collator",
-    "href": "posts/Based_on_Decoder.html#collator",
+    "objectID": "posts/Based_on_Decoder.html#datacollator",
+    "href": "posts/Based_on_Decoder.html#datacollator",
     "title": "Base on Decoder models",
-    "section": "2-4. Collator",
-    "text": "2-4. Collator\nDataCollator는 배치 내에서 sample을 패딩하거나, 마스킹을 적용하는 역할을 한다.\n\nfrom transformers import DataCollatorForLanguageModeling\n\ncollator = DataCollatorForLanguageModeling(tokenizer=tokenizer, mlm=False) # mlml = False: 마스크드 언어 모델링을 사용하지 않겠다는 의미\n# mlm=True로 설정한다면 일부 토큰을 [MASK]로 변환하여 원래 단어를 맞추도록 학습하는 방식이다. 이것은 인코더 기반의 BERT가 학습하는 방식이므로 지금은 False로 설정한다.\nsample = collator([grouped_dataset[\"train\"][i] for i in range(1)])\n# 위에서 데이터 전처리할 때 batch_size = 1이므로 range(1)로 설정했다. 만약 batch를 늘리고싶다면 range(???) ???을 늘리면 된다."
+    "section": "2-4. DataCollator",
+    "text": "2-4. DataCollator\nDataCollator는 배치 내에서 sample을 패딩하거나, 마스킹을 적용하는 역할을 한다.\n\nfrom transformers import DataCollatorForLanguageModeling\n\ncollator = DataCollatorForLanguageModeling(tokenizer=tokenizer, mlm=False) # mlml = False: 마스크드 언어 모델링을 사용하지 않겠다는 의미\n# mlm=True로 설정한다면 일부 토큰을 [MASK]로 변환하여 원래 단어를 맞추도록 학습하는 방식이다. 이것은 인코더 기반의 BERT가 학습하는 방식이므로 지금은 False로 설정한다.\nsample = collator([grouped_dataset[\"train\"][i] for i in range(1)])\n# 위에서 데이터 전처리할 때 batch_size = 1이므로 range(1)로 설정했다. 만약 batch를 늘리고싶다면 range(???) ???을 늘리면 된다."
   },
   {
     "objectID": "posts/Based_on_Decoder.html#evaluate",
@@ -588,11 +588,11 @@
     "text": "3-2. Dataset\n\nfrom datasets import load_dataset\n\ndataset = load_dataset(\"klue\", \"sts\")\n\ndef process_data(batch):\n  result = tokenizer(batch[\"sentence1\"], text_pair=batch[\"sentence2\"])\n  result[\"labels\"] = [x[\"binary-label\"] for x in batch[\"labels\"]]\n  return result\n\ndataset = dataset.map(process_data, batched=True, remove_columns=dataset[\"train\"].column_names)"
   },
   {
-    "objectID": "posts/Based_on_Decoder.html#collator-1",
-    "href": "posts/Based_on_Decoder.html#collator-1",
+    "objectID": "posts/Based_on_Decoder.html#datacollator-1",
+    "href": "posts/Based_on_Decoder.html#datacollator-1",
     "title": "Base on Decoder models",
-    "section": "3-3. Collator",
-    "text": "3-3. Collator\n\nfrom transformers import DataCollatorWithPadding # 패딩만을 진행하는 DataCollatorWithPadding 사용\n\ncollator = DataCollatorWithPadding(tokenizer)\nbatch = collator([dataset[\"train\"][i] for i in range(4)])"
+    "section": "3-3. DataCollator",
+    "text": "3-3. DataCollator\n\nfrom transformers import DataCollatorWithPadding # 패딩만을 진행하는 DataCollatorWithPadding 사용\n\ncollator = DataCollatorWithPadding(tokenizer)\nbatch = collator([dataset[\"train\"][i] for i in range(4)])"
   },
   {
     "objectID": "posts/Based_on_Decoder.html#predictions",
